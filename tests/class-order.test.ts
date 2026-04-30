@@ -1,0 +1,118 @@
+import { describe, it, expect } from 'vitest'
+import { sortClasses, classKey, CLASS_ORDER, BREAKPOINTS } from '../src/class-order'
+
+describe('classKey', () => {
+  it('returns a finite category index for known Bootstrap classes', () => {
+    const knownClasses = ['container', 'row', 'col', 'btn', 'd-flex', 'm-3', 'p-2', 'text-center']
+    for (const cls of knownClasses) {
+      const [catIdx] = classKey(cls)
+      expect(catIdx).not.toBe(Infinity)
+    }
+  })
+
+  it('returns Infinity for unknown classes', () => {
+    const [catIdx] = classKey('acme-widget')
+    expect(catIdx).toBe(Infinity)
+  })
+
+  it('returns breakpoint index 0 for base classes', () => {
+    const [, bpIdx] = classKey('d-flex')
+    expect(bpIdx).toBe(0)
+  })
+
+  it('extracts responsive infix correctly', () => {
+    const [catIdx, bpIdx] = classKey('d-md-flex')
+    expect(catIdx).not.toBe(Infinity)
+    expect(bpIdx).toBe(BREAKPOINTS.indexOf('md') + 1)
+  })
+
+  it('handles all breakpoint sizes', () => {
+    for (const [i, bp] of BREAKPOINTS.entries()) {
+      const [, bpIdx] = classKey(`d-${bp}-flex`)
+      expect(bpIdx).toBe(i + 1)
+    }
+  })
+
+  it('matches exact prefixes over shorter ones', () => {
+    const [fluidIdx] = classKey('container-fluid')
+    const [containerIdx] = classKey('container')
+    expect(fluidIdx).toBeLessThan(containerIdx)
+  })
+})
+
+describe('sortClasses', () => {
+  it('returns single-element arrays unchanged', () => {
+    expect(sortClasses(['btn'])).toEqual(['btn'])
+  })
+
+  it('sorts layout before components', () => {
+    const sorted = sortClasses(['btn', 'container', 'row'])
+    expect(sorted.indexOf('container')).toBeLessThan(sorted.indexOf('btn'))
+    expect(sorted.indexOf('row')).toBeLessThan(sorted.indexOf('btn'))
+  })
+
+  it('sorts components before utilities', () => {
+    const sorted = sortClasses(['d-flex', 'btn', 'p-3'])
+    expect(sorted.indexOf('btn')).toBeLessThan(sorted.indexOf('d-flex'))
+    expect(sorted.indexOf('btn')).toBeLessThan(sorted.indexOf('p-3'))
+  })
+
+  it('sorts utilities in _utilities.scss order', () => {
+    const classes = ['rounded', 'bg-primary', 'text-center', 'p-3', 'm-2', 'd-flex', 'border', 'shadow', 'w-100']
+    const sorted = sortClasses(classes)
+    const idx = (cls: string) => sorted.indexOf(cls)
+
+    expect(idx('d-flex')).toBeLessThan(idx('shadow'))
+    expect(idx('shadow')).toBeLessThan(idx('border'))
+    expect(idx('border')).toBeLessThan(idx('w-100'))
+    expect(idx('w-100')).toBeLessThan(idx('m-2'))
+    expect(idx('m-2')).toBeLessThan(idx('p-3'))
+    expect(idx('p-3')).toBeLessThan(idx('text-center'))
+    expect(idx('bg-primary')).toBeLessThan(idx('rounded'))
+  })
+
+  it('sorts responsive variants after base class', () => {
+    const sorted = sortClasses(['d-md-flex', 'd-flex', 'd-lg-none'])
+    expect(sorted).toEqual(['d-flex', 'd-md-flex', 'd-lg-none'])
+  })
+
+  it('preserves order of unknown classes', () => {
+    const sorted = sortClasses(['acme-b', 'acme-a', 'btn'])
+    expect(sorted.indexOf('btn')).toBeLessThan(sorted.indexOf('acme-b'))
+    expect(sorted.indexOf('acme-b')).toBeLessThan(sorted.indexOf('acme-a'))
+  })
+
+  it('handles a realistic Bootstrap class list', () => {
+    const input = ['text-center', 'p-3', 'container', 'bg-primary', 'text-white', 'mb-4', 'rounded']
+    const sorted = sortClasses(input)
+    expect(sorted[0]).toBe('container')
+    expect(sorted).toHaveLength(input.length)
+  })
+
+  it('handles mixed component and utility classes', () => {
+    const input = ['mt-3', 'card', 'shadow-sm', 'card-body', 'p-4']
+    const sorted = sortClasses(input)
+    expect(sorted.indexOf('card')).toBeLessThan(sorted.indexOf('mt-3'))
+    expect(sorted.indexOf('card-body')).toBeLessThan(sorted.indexOf('mt-3'))
+  })
+
+  it('handles spacing utility ordering (margin before padding)', () => {
+    const sorted = sortClasses(['p-3', 'm-2', 'py-1', 'mx-auto'])
+    expect(sorted.indexOf('m-2')).toBeLessThan(sorted.indexOf('p-3'))
+    expect(sorted.indexOf('mx-auto')).toBeLessThan(sorted.indexOf('py-1'))
+  })
+})
+
+describe('CLASS_ORDER', () => {
+  it('has no duplicate entries', () => {
+    const seen = new Set<string>()
+    for (const entry of CLASS_ORDER) {
+      expect(seen.has(entry)).toBe(false)
+      seen.add(entry)
+    }
+  })
+
+  it('starts with layout classes', () => {
+    expect(CLASS_ORDER[0]).toMatch(/^container/)
+  })
+})

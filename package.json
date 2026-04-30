@@ -1,0 +1,53 @@
+{
+  "name": "prettier-plugin-bootstrap",
+  "version": "0.1.0",
+  "description": "A Prettier plugin for automatic Bootstrap class sorting",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "prettier",
+    "plugin",
+    "bootstrap",
+    "css",
+    "class",
+    "sorting",
+    "class-order",
+    "formatter"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pierluigilenoci/prettier-plugin-bootstrap.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues"
+  },
+  "homepage": "https://github.com/pierluigilenoci/prettier-plugin-bootstrap#readme",
+  "peerDependencies": {
+    "prettier": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.0",
+    "tsdown": "^0.12.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.1.0"
+  },
+  "scripts": {
+    "build": "tsdown && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  }
+}
