@@ -32,22 +32,31 @@ function createParserWrapper(
     astFormat:
       parserName === 'html' || parserName === 'vue' || parserName === 'angular'
         ? 'html'
-        : undefined,
+        : 'estree',
     async parse(text: string, options: any) {
       const plugins = (options.plugins || []) as Plugin[]
 
-      const originalParser = plugins
-        .flatMap((plugin) => {
-          if (
-            typeof plugin === 'object' &&
-            plugin.parsers &&
-            plugin.parsers[parserName]
-          ) {
-            return [plugin.parsers[parserName]]
-          }
-          return []
-        })
-        .find((parser) => parser.parse !== wrapper.parse)
+      let originalParser: any = null
+
+      for (const plugin of plugins) {
+        if (typeof plugin !== 'object' || !plugin.parsers) continue
+        const candidate: any = plugin.parsers[parserName]
+        if (!candidate) continue
+
+        let resolved: any = candidate
+        if (typeof candidate === 'function' && !candidate.parse) {
+          resolved = await candidate()
+        }
+
+        if (
+          resolved &&
+          typeof resolved.parse === 'function' &&
+          resolved.parse !== wrapper.parse
+        ) {
+          originalParser = resolved
+          break
+        }
+      }
 
       if (!originalParser) {
         throw new Error(
@@ -56,7 +65,7 @@ function createParserWrapper(
         )
       }
 
-      const ast = await originalParser.parse!(text, options as any)
+      const ast = await originalParser.parse(text, options as any)
 
       const targetAttrs = [
         ...DEFAULT_ATTRIBUTES,
