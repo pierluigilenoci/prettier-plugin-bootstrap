@@ -97,7 +97,7 @@ pnpm run typecheck
 ## Compatibility
 
 - Prettier >= 3.0.0
-- Node.js >= 18
+- Node.js >= 20
 
 ## License
 
