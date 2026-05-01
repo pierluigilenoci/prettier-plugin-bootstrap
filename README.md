@@ -85,6 +85,16 @@ Unknown classes are preserved in their original relative order and placed after 
 - `acorn` / `meriyah` — Alternative JS parsers
 - `astro` — Astro components (requires `prettier-plugin-astro`)
 
+### Astro
+
+When using with `prettier-plugin-astro`, list `prettier-plugin-bootstrap` **after** `prettier-plugin-astro` in your config so it can wrap the Astro parser:
+
+```json
+{
+  "plugins": ["prettier-plugin-astro", "prettier-plugin-bootstrap"]
+}
+```
+
 ## Development
 
 ```bash

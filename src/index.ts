@@ -27,12 +27,10 @@ export const options = {
 function createParserWrapper(
   parserName: string,
   processAst: AstProcessor,
+  astFormat: string,
 ): Partial<Parser> {
   const wrapper: Partial<Parser> = {
-    astFormat:
-      parserName === 'html' || parserName === 'vue' || parserName === 'angular'
-        ? 'html'
-        : 'estree',
+    astFormat,
     async parse(text: string, options: any) {
       const plugins = (options.plugins || []) as Plugin[]
 
@@ -80,15 +78,15 @@ function createParserWrapper(
 }
 
 export const parsers: Record<string, Partial<Parser>> = {
-  html: createParserWrapper('html', processHtmlAst),
-  vue: createParserWrapper('vue', processHtmlAst),
-  angular: createParserWrapper('angular', processHtmlAst),
-  babel: createParserWrapper('babel', processJsxAst),
-  'babel-ts': createParserWrapper('babel-ts', processJsxAst),
-  typescript: createParserWrapper('typescript', processJsxAst),
-  acorn: createParserWrapper('acorn', processJsxAst),
-  meriyah: createParserWrapper('meriyah', processJsxAst),
-  astro: createParserWrapper('astro', processHtmlAst),
+  html: createParserWrapper('html', processHtmlAst, 'html'),
+  vue: createParserWrapper('vue', processHtmlAst, 'html'),
+  angular: createParserWrapper('angular', processHtmlAst, 'html'),
+  babel: createParserWrapper('babel', processJsxAst, 'estree'),
+  'babel-ts': createParserWrapper('babel-ts', processJsxAst, 'estree'),
+  typescript: createParserWrapper('typescript', processJsxAst, 'estree'),
+  acorn: createParserWrapper('acorn', processJsxAst, 'estree'),
+  meriyah: createParserWrapper('meriyah', processJsxAst, 'estree'),
+  astro: createParserWrapper('astro', processHtmlAst, 'astro'),
 }
 
 export type { BootstrapPluginOptions } from './types'
