@@ -31,6 +31,12 @@ function createParserWrapper(
 ): Partial<Parser> {
   const wrapper: Partial<Parser> = {
     astFormat,
+    locStart(node: any) {
+      return node.range?.[0] ?? node.start ?? node.sourceSpan?.start?.offset ?? 0
+    },
+    locEnd(node: any) {
+      return node.range?.[1] ?? node.end ?? node.sourceSpan?.end?.offset ?? 0
+    },
     async parse(text: string, options: any) {
       const plugins = (options.plugins || []) as Plugin[]
 
@@ -61,6 +67,13 @@ function createParserWrapper(
           `prettier-plugin-bootstrap: could not find the "${parserName}" parser. ` +
             'Make sure Prettier and the relevant parser plugin are installed.',
         )
+      }
+
+      if (originalParser.locStart) {
+        wrapper.locStart = originalParser.locStart
+      }
+      if (originalParser.locEnd) {
+        wrapper.locEnd = originalParser.locEnd
       }
 
       const ast = await originalParser.parse(text, options as any)
