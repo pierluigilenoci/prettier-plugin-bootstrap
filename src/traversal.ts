@@ -61,8 +61,11 @@ export function processHtmlAst(ast: any, targetAttrs: string[]): any {
         const name = attr.name || (attr.key && attr.key.value)
         if (targetAttrs.includes(name) && attr.value) {
           if (typeof attr.value === 'string') {
+            if (attr.kind && attr.kind !== 'quoted') continue
+            if (attr.value.includes('${')) continue
             attr.value = sortClassString(attr.value)
           } else if (attr.value && typeof attr.value.value === 'string') {
+            if (attr.value.value.includes('${')) continue
             attr.value.value = sortClassString(attr.value.value)
           }
         }
