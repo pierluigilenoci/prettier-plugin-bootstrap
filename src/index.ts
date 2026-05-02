@@ -1,9 +1,9 @@
 import type { Parser, Plugin } from 'prettier'
-import { processHtmlAst, processJsxAst } from './traversal'
+import { processHtmlAst, processJsxAst, processSvelteAst } from './traversal'
 
 const DEFAULT_ATTRIBUTES = ['class', 'className']
 
-type AstProcessor = (ast: any, targetAttrs: string[]) => any
+type AstProcessor = (ast: any, targetAttrs: string[], targetFunctions: string[]) => any
 
 export const options = {
   bootstrapAttributes: {
@@ -51,11 +51,7 @@ function createParserWrapper(
           resolved = await candidate()
         }
 
-        if (
-          resolved &&
-          typeof resolved.parse === 'function' &&
-          resolved.parse !== wrapper.parse
-        ) {
+        if (resolved && typeof resolved.parse === 'function' && resolved.parse !== wrapper.parse) {
           originalParser = resolved
           break
         }
@@ -77,12 +73,10 @@ function createParserWrapper(
 
       const ast = await originalParser.parse(text, options as any)
 
-      const targetAttrs = [
-        ...DEFAULT_ATTRIBUTES,
-        ...(options.bootstrapAttributes || []),
-      ]
+      const targetAttrs = [...DEFAULT_ATTRIBUTES, ...(options.bootstrapAttributes || [])]
+      const targetFunctions = options.bootstrapFunctions || []
 
-      return processAst(ast, targetAttrs)
+      return processAst(ast, targetAttrs, targetFunctions)
     },
   }
 
@@ -99,6 +93,7 @@ export const parsers: Record<string, Partial<Parser>> = {
   acorn: createParserWrapper('acorn', processJsxAst, 'estree'),
   meriyah: createParserWrapper('meriyah', processJsxAst, 'estree'),
   astro: createParserWrapper('astro', processHtmlAst, 'astro'),
+  svelte: createParserWrapper('svelte', processSvelteAst, 'svelte-ast'),
 }
 
 export type { BootstrapPluginOptions } from './types'

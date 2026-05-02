@@ -12,13 +12,13 @@ pnpm run test
 
 ## Development scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm run build` | Build the plugin |
-| `pnpm run test` | Run tests |
-| `pnpm run test:coverage` | Run tests with coverage |
-| `pnpm run lint` | Run ESLint |
-| `pnpm run typecheck` | Run TypeScript type check |
+| Command                  | Description               |
+| ------------------------ | ------------------------- |
+| `pnpm run build`         | Build the plugin          |
+| `pnpm run test`          | Run tests                 |
+| `pnpm run test:coverage` | Run tests with coverage   |
+| `pnpm run lint`          | Run ESLint                |
+| `pnpm run typecheck`     | Run TypeScript type check |
 
 ## Submitting a PR
 

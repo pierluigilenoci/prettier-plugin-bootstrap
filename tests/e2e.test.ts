@@ -95,9 +95,9 @@ describe('e2e — prettier.format() with plugin', () => {
 
     it('throws when parser is not available', async () => {
       const parser = plugin.parsers.html!
-      await expect(
-        parser.parse!('<div></div>', { plugins: [] } as any),
-      ).rejects.toThrow('could not find the "html" parser')
+      await expect(parser.parse!('<div></div>', { plugins: [] } as any)).rejects.toThrow(
+        'could not find the "html" parser',
+      )
     })
 
     it('locStart/locEnd use fallback values', async () => {
@@ -150,16 +150,20 @@ describe('e2e — prettier.format() with plugin', () => {
 
     it('handles options.plugins being undefined', async () => {
       const parser = plugin.parsers.html!
-      await expect(
-        parser.parse!('<div></div>', { plugins: undefined } as any),
-      ).rejects.toThrow('could not find the "html" parser')
+      await expect(parser.parse!('<div></div>', { plugins: undefined } as any)).rejects.toThrow(
+        'could not find the "html" parser',
+      )
     })
 
     it('skips string plugins and plugins without parsers', async () => {
       const parser = plugin.parsers.html!
       const realHtmlParser = (await import('prettier/plugins/html')).default.parsers!.html
       const result = await parser.parse!('<div class="mt-3 container"></div>', {
-        plugins: ['some-string-plugin', { name: 'no-parsers' }, { parsers: { html: realHtmlParser } }],
+        plugins: [
+          'some-string-plugin',
+          { name: 'no-parsers' },
+          { parsers: { html: realHtmlParser } },
+        ],
         bootstrapAttributes: [],
       } as any)
       expect(result).toBeDefined()
@@ -180,6 +184,45 @@ describe('e2e — prettier.format() with plugin', () => {
       const input = '<div class="   "></div>\n'
       const result = await format(input, 'html')
       expect(result).toBeDefined()
+    })
+  })
+
+  describe('bootstrapFunctions', () => {
+    it('sorts string arguments in configured function calls', async () => {
+      const input = 'const x = clsx("mt-3 container p-2");\n'
+      const result = await format(input, 'babel', { bootstrapFunctions: ['clsx'] })
+      expect(result).toContain('clsx("container mt-3 p-2")')
+    })
+
+    it('sorts multiple arguments', async () => {
+      const input = 'const x = clsx("mt-3 container", "p-2 row");\n'
+      const result = await format(input, 'babel', { bootstrapFunctions: ['clsx'] })
+      expect(result).toContain('"container mt-3"')
+      expect(result).toContain('"row p-2"')
+    })
+
+    it('ignores non-configured function calls', async () => {
+      const input = 'const x = someOther("mt-3 container");\n'
+      const result = await format(input, 'babel', { bootstrapFunctions: ['clsx'] })
+      expect(result).toContain('"mt-3 container"')
+    })
+
+    it('works with typescript parser', async () => {
+      const input = 'const x: string = cn("mt-3 container");\n'
+      const result = await format(input, 'typescript', { bootstrapFunctions: ['cn'] })
+      expect(result).toContain('cn("container mt-3")')
+    })
+
+    it('handles template literals without expressions', async () => {
+      const input = 'const x = clsx(`mt-3 container`);\n'
+      const result = await format(input, 'babel', { bootstrapFunctions: ['clsx'] })
+      expect(result).toContain('`container mt-3`')
+    })
+
+    it('does nothing when bootstrapFunctions is empty', async () => {
+      const input = 'const x = clsx("mt-3 container");\n'
+      const result = await format(input, 'babel')
+      expect(result).toContain('"mt-3 container"')
     })
   })
 })

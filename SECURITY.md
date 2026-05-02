@@ -17,5 +17,5 @@ You should receive a response within 72 hours. We will work with you to understa
 ## Supported Versions
 
 | Version | Supported |
-|---------|-----------|
+| ------- | --------- |
 | 0.1.x   | Yes       |
