@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest'
 import * as prettier from 'prettier'
 import * as plugin from '../src/index'
 
-async function format(code: string, parser: string) {
+async function format(code: string, parser: string, options?: Record<string, any>) {
   return prettier.format(code, {
     parser,
     plugins: [plugin],
+    ...options,
   })
 }
 
@@ -33,6 +34,20 @@ describe('e2e — prettier.format() with plugin', () => {
       const result = await format(input, 'html')
       expect(result).toContain('class="container p-3"')
       expect(result).toContain('class="fw-bold text-primary"')
+    })
+
+    it('skips template literal attributes', async () => {
+      const input = '<div class="container ${dynamicClass} p-3"></div>\n'
+      const result = await format(input, 'html')
+      expect(result).toContain('${dynamicClass}')
+    })
+  })
+
+  describe('Angular parser', () => {
+    it('sorts class attributes in Angular templates', async () => {
+      const input = '<div class="mt-3 container p-2"></div>\n'
+      const result = await format(input, 'angular')
+      expect(result).toContain('class="container mt-3 p-2"')
     })
   })
 
@@ -76,6 +91,95 @@ describe('e2e — prettier.format() with plugin', () => {
       const input = '<div class="custom-class another-custom"></div>\n'
       const result = await format(input, 'html')
       expect(result).toContain('class="custom-class another-custom"')
+    })
+
+    it('throws when parser is not available', async () => {
+      const parser = plugin.parsers.html!
+      await expect(
+        parser.parse!('<div></div>', { plugins: [] } as any),
+      ).rejects.toThrow('could not find the "html" parser')
+    })
+
+    it('locStart/locEnd use fallback values', async () => {
+      // Import fresh to get unmodified locStart/locEnd before any parse() call overwrites them
+      const freshPlugin = await import('../src/index')
+      const parser = freshPlugin.parsers.meriyah!
+      expect(parser.locStart!({ range: [5, 10] })).toBe(5)
+      expect(parser.locEnd!({ range: [5, 10] })).toBe(10)
+      expect(parser.locStart!({ start: 3 })).toBe(3)
+      expect(parser.locEnd!({ end: 7 })).toBe(7)
+      expect(parser.locStart!({ sourceSpan: { start: { offset: 2 } } })).toBe(2)
+      expect(parser.locEnd!({ sourceSpan: { end: { offset: 9 } } })).toBe(9)
+      expect(parser.locStart!({})).toBe(0)
+      expect(parser.locEnd!({})).toBe(0)
+    })
+
+    it('handles lazy parser function (candidate as async function)', async () => {
+      const realHtmlParser = (await import('prettier/plugins/html')).default.parsers!.html
+      const lazyPlugin = {
+        parsers: {
+          html: Object.assign(async () => realHtmlParser, {}),
+        },
+      }
+      const parser = plugin.parsers.html!
+      const ast = await parser.parse!('<div class="mt-3 container"></div>', {
+        plugins: [{ parsers: { html: lazyPlugin.parsers.html } }],
+        bootstrapAttributes: [],
+      } as any)
+      expect(ast).toBeDefined()
+    })
+
+    it('skips plugin whose resolved parse is the wrapper itself', async () => {
+      const result = await prettier.format('<div class="mt-3 container"></div>\n', {
+        parser: 'html',
+        plugins: [plugin, { parsers: { html: plugin.parsers.html } } as any],
+      })
+      expect(result).toContain('class="container mt-3"')
+    })
+
+    it('uses fallback empty array when bootstrapAttributes is undefined', async () => {
+      const parser = plugin.parsers.html!
+      const realHtmlParser = (await import('prettier/plugins/html')).default.parsers!.html
+      const wrapperPlugin = { parsers: { html: realHtmlParser } }
+      const ast = await parser.parse!('<div class="mt-3 container"></div>', {
+        plugins: [wrapperPlugin],
+        bootstrapAttributes: undefined,
+      } as any)
+      expect(ast).toBeDefined()
+    })
+
+    it('handles options.plugins being undefined', async () => {
+      const parser = plugin.parsers.html!
+      await expect(
+        parser.parse!('<div></div>', { plugins: undefined } as any),
+      ).rejects.toThrow('could not find the "html" parser')
+    })
+
+    it('skips string plugins and plugins without parsers', async () => {
+      const parser = plugin.parsers.html!
+      const realHtmlParser = (await import('prettier/plugins/html')).default.parsers!.html
+      const result = await parser.parse!('<div class="mt-3 container"></div>', {
+        plugins: ['some-string-plugin', { name: 'no-parsers' }, { parsers: { html: realHtmlParser } }],
+        bootstrapAttributes: [],
+      } as any)
+      expect(result).toBeDefined()
+    })
+
+    it('skips plugin where resolved.parse equals wrapper.parse', async () => {
+      const parser = plugin.parsers.html!
+      const realHtmlParser = (await import('prettier/plugins/html')).default.parsers!.html
+      const selfRef = { parsers: { html: { parse: parser.parse } } }
+      const result = await parser.parse!('<div class="mt-3 container"></div>', {
+        plugins: [selfRef, { parsers: { html: realHtmlParser } }],
+        bootstrapAttributes: [],
+      } as any)
+      expect(result).toBeDefined()
+    })
+
+    it('handles whitespace-only class value', async () => {
+      const input = '<div class="   "></div>\n'
+      const result = await format(input, 'html')
+      expect(result).toBeDefined()
     })
   })
 })
