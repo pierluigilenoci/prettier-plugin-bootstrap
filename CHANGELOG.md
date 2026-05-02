@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.2.0...v0.2.1) (2026-05-02)
+
+
+### Bug Fixes
+
+* **ci:** ignore auto-generated CHANGELOG.md in format check ([b23164f](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/b23164fb1efdce7b41e7b0286e31b3cfa0adffcb))
+
 ## [0.2.0](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.1.3...v0.2.0) (2026-05-02)
 
 
