@@ -1,7 +1,5 @@
 import { sortClassString } from './sorting'
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 const AST_KEYS = [
   'program', 'expression', 'left', 'right', 'argument', 'callee',
   'object', 'property', 'consequent', 'alternate', 'init', 'test',

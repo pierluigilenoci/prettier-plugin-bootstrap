@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Lint
+        run: pnpm run lint
+
       - name: Type check
         run: pnpm run typecheck
 
@@ -42,4 +45,13 @@ jobs:
         run: pnpm run build
 
       - name: Test
-        run: pnpm run test
+        run: pnpm run test:coverage
+
+      - name: Upload coverage
+        if: matrix.node-version == 22
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage/lcov.info
+
+      - name: Publish dry-run
+        run: pnpm publish --dry-run --no-git-checks

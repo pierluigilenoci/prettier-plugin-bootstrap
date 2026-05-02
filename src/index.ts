@@ -1,5 +1,4 @@
 import type { Parser, Plugin } from 'prettier'
-import type { BootstrapPluginOptions } from './types'
 import { processHtmlAst, processJsxAst } from './traversal'
 
 const DEFAULT_ATTRIBUTES = ['class', 'className']
