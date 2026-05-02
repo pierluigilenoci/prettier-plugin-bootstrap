@@ -6,7 +6,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     }
   },
@@ -49,6 +49,7 @@
   },
   "scripts": {
     "build": "tsdown && tsc -p tsconfig.build.json",
+    "format:check": "prettier --check .",
     "lint": "eslint .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

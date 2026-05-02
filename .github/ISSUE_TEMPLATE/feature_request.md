@@ -1,7 +1,7 @@
 ---
 name: Feature Request
 about: Suggest an idea for the plugin
-title: "[Feature]: "
+title: '[Feature]: '
 labels: enhancement
 ---
 

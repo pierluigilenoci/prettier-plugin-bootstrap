@@ -58,7 +58,17 @@ describe('sortClasses', () => {
   })
 
   it('sorts utilities in _utilities.scss order', () => {
-    const classes = ['rounded', 'bg-primary', 'text-center', 'p-3', 'm-2', 'd-flex', 'border', 'shadow', 'w-100']
+    const classes = [
+      'rounded',
+      'bg-primary',
+      'text-center',
+      'p-3',
+      'm-2',
+      'd-flex',
+      'border',
+      'shadow',
+      'w-100',
+    ]
     const sorted = sortClasses(classes)
     const idx = (cls: string) => sorted.indexOf(cls)
 

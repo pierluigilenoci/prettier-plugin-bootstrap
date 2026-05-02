@@ -7,7 +7,7 @@
 
 A [Prettier](https://prettier.io/) plugin that automatically sorts Bootstrap CSS classes following the framework's recommended order.
 
-Works with **HTML**, **JSX/TSX**, **Vue**, **Angular**, and **Astro** templates.
+Works with **HTML**, **JSX/TSX**, **Vue**, **Angular**, **Svelte**, and **Astro** templates.
 
 ## Installation
 
@@ -63,17 +63,18 @@ Unknown classes are preserved in their original relative order and placed after 
 
 ## Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `bootstrapAttributes` | `string[]` | `[]` | Additional HTML attributes to sort (beyond `class` and `className`) |
-| `bootstrapFunctions` | `string[]` | `[]` | Function names whose arguments are class lists (e.g. `clsx`, `classNames`) |
+| Option                | Type       | Default | Description                                                                |
+| --------------------- | ---------- | ------- | -------------------------------------------------------------------------- |
+| `bootstrapAttributes` | `string[]` | `[]`    | Additional HTML attributes to sort (beyond `class` and `className`)        |
+| `bootstrapFunctions`  | `string[]` | `[]`    | Function names whose arguments are class lists (e.g. `clsx`, `classNames`) |
 
 ### Example
 
 ```json
 {
   "plugins": ["prettier-plugin-bootstrap"],
-  "bootstrapAttributes": ["ngClass", "v-bind:class"]
+  "bootstrapAttributes": ["ngClass", "v-bind:class"],
+  "bootstrapFunctions": ["clsx", "cn", "classNames"]
 }
 ```
 
@@ -84,7 +85,18 @@ Unknown classes are preserved in their original relative order and placed after 
 - `angular` — Angular templates
 - `babel` / `babel-ts` / `typescript` — JSX/TSX files
 - `acorn` / `meriyah` — Alternative JS parsers
+- `svelte` — Svelte components (requires `prettier-plugin-svelte`)
 - `astro` — Astro components (requires `prettier-plugin-astro`)
+
+### Svelte
+
+When using with `prettier-plugin-svelte`, list `prettier-plugin-bootstrap` **after** `prettier-plugin-svelte` in your config:
+
+```json
+{
+  "plugins": ["prettier-plugin-svelte", "prettier-plugin-bootstrap"]
+}
+```
 
 ### Astro
 
