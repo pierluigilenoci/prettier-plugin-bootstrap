@@ -9,6 +9,13 @@ A [Prettier](https://prettier.io/) plugin that automatically sorts Bootstrap CSS
 
 Works with **HTML**, **JSX/TSX**, **Vue**, **Angular**, **Svelte**, and **Astro** templates.
 
+## Why?
+
+- **Consistency** — Every file in your project uses the same class order, regardless of who wrote it.
+- **Smaller diffs** — Sorted classes eliminate noisy reordering in pull requests.
+- **Readability** — Classes follow Bootstrap's architecture (layout → components → utilities), making it easier to scan what an element does.
+- **Zero config** — Just add the plugin and format. No ESLint rules to configure, no manual sorting.
+
 ## Installation
 
 ```bash
@@ -63,19 +70,85 @@ Unknown classes are preserved in their original relative order and placed after 
 
 ## Options
 
-| Option                | Type       | Default | Description                                                                |
-| --------------------- | ---------- | ------- | -------------------------------------------------------------------------- |
-| `bootstrapAttributes` | `string[]` | `[]`    | Additional HTML attributes to sort (beyond `class` and `className`)        |
-| `bootstrapFunctions`  | `string[]` | `[]`    | Function names whose arguments are class lists (e.g. `clsx`, `classNames`) |
+| Option                        | Type       | Default | Description                                                                                                          |
+| ----------------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `bootstrapAttributes`         | `string[]` | `[]`    | Additional HTML attributes to sort (beyond `class` and `className`). Supports regex patterns (e.g. `/^data-class/`). |
+| `bootstrapFunctions`          | `string[]` | `[]`    | Function names whose arguments are class lists (e.g. `clsx`, `classNames`)                                           |
+| `bootstrapPreserveWhitespace` | `boolean`  | `false` | Preserve original whitespace between classes instead of normalizing to single spaces                                 |
+| `bootstrapPreserveDuplicates` | `boolean`  | `true`  | Keep duplicate class names. Set to `false` to remove duplicates                                                      |
+| `bootstrapVersion`            | `int`      | `5`     | Bootstrap version (for future version-specific sorting rules)                                                        |
 
 ### Example
 
 ```json
 {
   "plugins": ["prettier-plugin-bootstrap"],
-  "bootstrapAttributes": ["ngClass", "v-bind:class"],
+  "bootstrapAttributes": ["ngClass", "v-bind:class", "/^data-class/"],
   "bootstrapFunctions": ["clsx", "cn", "classNames"]
 }
+```
+
+### TypeScript Configuration
+
+For type-safe configuration, use JSDoc annotations:
+
+```js
+/** @type {import('prettier-plugin-bootstrap').BootstrapPluginOptions} */
+const config = {
+  plugins: ['prettier-plugin-bootstrap'],
+  bootstrapAttributes: ['ngClass'],
+  bootstrapFunctions: ['clsx', 'cn'],
+  bootstrapPreserveDuplicates: false,
+}
+
+export default config
+```
+
+### Regex Attributes
+
+You can use regex patterns in `bootstrapAttributes` to match dynamic attribute names:
+
+```json
+{
+  "bootstrapAttributes": ["/^data-class/", "/Class$/"]
+}
+```
+
+Patterns must be wrapped in forward slashes. Optional flags (`i`, `g`, etc.) are supported: `/^data-class/i`.
+
+### File-Level Ignore
+
+Add a comment at the top of a file to skip Bootstrap class sorting for the entire file:
+
+```html
+<!-- prettier-bootstrap-ignore -->
+<div class="mt-3 container">Will not be sorted</div>
+```
+
+For JS/TS files:
+
+```js
+// prettier-bootstrap-ignore
+export default () => <div className="mt-3 container">Not sorted</div>
+```
+
+Or block comment style:
+
+```js
+/* prettier-bootstrap-ignore */
+```
+
+## Public Sorting API
+
+For programmatic use (linters, codemods, build tools), import the sorter directly:
+
+```js
+import { createSorter } from 'prettier-plugin-bootstrap/sorter'
+
+const sorter = createSorter({ preserveDuplicates: false })
+
+sorter.sort('mt-3 container p-2') // "container mt-3 p-2"
+sorter.sortClasses(['mt-3', 'container']) // ["container", "mt-3"]
 ```
 
 ## Supported Parsers
@@ -108,6 +181,28 @@ When using with `prettier-plugin-astro`, list `prettier-plugin-bootstrap` **afte
 }
 ```
 
+## Plugin Compatibility
+
+This plugin works alongside other Prettier plugins. Load order matters — `prettier-plugin-bootstrap` should come **last** so it can wrap the parsers registered by other plugins.
+
+| Plugin                                  | Compatible | Load Order                               |
+| --------------------------------------- | ---------- | ---------------------------------------- |
+| `prettier-plugin-svelte`                | Yes        | svelte first                             |
+| `prettier-plugin-astro`                 | Yes        | astro first                              |
+| `prettier-plugin-tailwindcss`           | N/A        | Use one or the other (both sort classes) |
+| `prettier-plugin-organize-imports`      | Yes        | Any order                                |
+| `@trivago/prettier-plugin-sort-imports` | Yes        | Any order                                |
+
+## FAQ
+
+### Does class sorting affect line wrapping?
+
+Yes. Reordering classes changes the string length, which may cause Prettier to wrap lines differently based on your `printWidth` setting. This is expected — the formatting is still deterministic and consistent.
+
+### Can I use this with Tailwind CSS?
+
+This plugin is designed specifically for Bootstrap's class system. If you use Tailwind CSS, use `prettier-plugin-tailwindcss` instead. They should not be used together as they have conflicting sort orders.
+
 ## Development
 
 ```bash
@@ -121,6 +216,7 @@ pnpm run typecheck
 
 - Prettier >= 3.0.0
 - Node.js >= 20
+- Bootstrap 5 (class order)
 
 ## License
 

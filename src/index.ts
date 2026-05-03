@@ -1,26 +1,65 @@
 import type { Parser, Plugin } from 'prettier'
 import { processHtmlAst, processJsxAst, processSvelteAst } from './traversal'
+import type { SortOptions } from './types'
 
 const DEFAULT_ATTRIBUTES = ['class', 'className']
 
-type AstProcessor = (ast: any, targetAttrs: string[], targetFunctions: string[]) => any
+const IGNORE_RE =
+  /(?:<!--\s*prettier-bootstrap-ignore\s*-->|\/\/\s*prettier-bootstrap-ignore|\/\*\s*prettier-bootstrap-ignore\s*\*\/)/
+
+type AstProcessor = (
+  ast: any,
+  attrMatcher: (name: string) => boolean,
+  targetFunctions: string[],
+  sortOptions: SortOptions,
+) => any
 
 export const options = {
   bootstrapAttributes: {
     type: 'string' as const,
-    array: true,
+    array: true as const,
     default: [{ value: [] }],
     category: 'Bootstrap',
     description: 'Additional HTML attributes containing Bootstrap class lists to sort.',
   },
   bootstrapFunctions: {
     type: 'string' as const,
-    array: true,
+    array: true as const,
     default: [{ value: [] }],
     category: 'Bootstrap',
     description:
       'Function names whose arguments are Bootstrap class lists (e.g. clsx, classNames).',
   },
+  bootstrapPreserveWhitespace: {
+    type: 'boolean' as const,
+    default: false,
+    category: 'Bootstrap',
+    description:
+      'Preserve original whitespace between classes instead of normalizing to single spaces.',
+  },
+  bootstrapPreserveDuplicates: {
+    type: 'boolean' as const,
+    default: true,
+    category: 'Bootstrap',
+    description: 'Keep duplicate class names. Set to false to remove duplicates.',
+  },
+  bootstrapVersion: {
+    type: 'int' as const,
+    default: 5,
+    category: 'Bootstrap',
+    description: 'Bootstrap version (for future version-specific sorting rules).',
+  },
+}
+
+function buildAttrMatcher(allAttrs: string[]): (name: string) => boolean {
+  const plainAttrs: string[] = []
+  const regexAttrs: RegExp[] = []
+  for (const attr of allAttrs) {
+    const m = attr.match(/^\/(.+)\/([gimsuy]*)$/)
+    if (m) regexAttrs.push(new RegExp(m[1], m[2]))
+    else plainAttrs.push(attr)
+  }
+  return (name: string) => plainAttrs.includes(name) || regexAttrs.some((re) => re.test(name))
 }
 
 function createParserWrapper(
@@ -71,30 +110,45 @@ function createParserWrapper(
         wrapper.locEnd = originalParser.locEnd
       }
 
+      if (originalParser.astFormat) {
+        wrapper.astFormat = originalParser.astFormat
+      }
+
       const ast = await originalParser.parse(text, options as any)
+
+      if (IGNORE_RE.test(text.slice(0, 1500))) {
+        return ast
+      }
 
       const targetAttrs = [...DEFAULT_ATTRIBUTES, ...(options.bootstrapAttributes || [])]
       const targetFunctions = options.bootstrapFunctions || []
+      const attrMatcher = buildAttrMatcher(targetAttrs)
 
-      return processAst(ast, targetAttrs, targetFunctions)
+      const sortOptions: SortOptions = {
+        preserveWhitespace: options.bootstrapPreserveWhitespace ?? false,
+        preserveDuplicates: options.bootstrapPreserveDuplicates ?? true,
+      }
+
+      return processAst(ast, attrMatcher, targetFunctions, sortOptions)
     },
   }
 
   return wrapper
 }
 
-export const parsers: Record<string, Partial<Parser>> = {
-  html: createParserWrapper('html', processHtmlAst, 'html'),
-  vue: createParserWrapper('vue', processHtmlAst, 'html'),
-  angular: createParserWrapper('angular', processHtmlAst, 'html'),
-  babel: createParserWrapper('babel', processJsxAst, 'estree'),
-  'babel-ts': createParserWrapper('babel-ts', processJsxAst, 'estree'),
-  typescript: createParserWrapper('typescript', processJsxAst, 'estree'),
-  acorn: createParserWrapper('acorn', processJsxAst, 'estree'),
-  meriyah: createParserWrapper('meriyah', processJsxAst, 'estree'),
-  astro: createParserWrapper('astro', processHtmlAst, 'astro'),
-  svelte: createParserWrapper('svelte', processSvelteAst, 'svelte-ast'),
+export const parsers: Record<string, Parser> = {
+  html: createParserWrapper('html', processHtmlAst, 'html') as Parser,
+  vue: createParserWrapper('vue', processHtmlAst, 'html') as Parser,
+  angular: createParserWrapper('angular', processHtmlAst, 'html') as Parser,
+  babel: createParserWrapper('babel', processJsxAst, 'estree') as Parser,
+  'babel-ts': createParserWrapper('babel-ts', processJsxAst, 'estree') as Parser,
+  typescript: createParserWrapper('typescript', processJsxAst, 'estree') as Parser,
+  acorn: createParserWrapper('acorn', processJsxAst, 'estree') as Parser,
+  meriyah: createParserWrapper('meriyah', processJsxAst, 'estree') as Parser,
+  astro: createParserWrapper('astro', processHtmlAst, 'astro') as Parser,
+  svelte: createParserWrapper('svelte', processSvelteAst, 'svelte-ast') as Parser,
 }
 
-export type { BootstrapPluginOptions } from './types'
+export { buildAttrMatcher }
+export type { BootstrapPluginOptions, SortOptions } from './types'
 export { sortClasses, classKey, CLASS_ORDER, BREAKPOINTS } from './class-order'
