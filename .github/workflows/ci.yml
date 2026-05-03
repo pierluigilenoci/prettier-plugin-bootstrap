@@ -19,6 +19,7 @@ jobs:
     strategy:
       matrix:
         node-version: [20, 22]
+        prettier-version: ['3.0.0', '3']
 
     steps:
       - uses: actions/checkout@v6
@@ -35,6 +36,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Install Prettier ${{ matrix.prettier-version }}
+        if: matrix.prettier-version != '3'
+        run: pnpm add -D prettier@${{ matrix.prettier-version }}
+
       - name: Lint
         run: pnpm run lint
 
@@ -48,10 +53,15 @@ jobs:
         run: pnpm run build
 
       - name: Test
+        if: matrix.prettier-version != '3'
+        run: pnpm run test
+
+      - name: Test with coverage
+        if: matrix.prettier-version == '3'
         run: pnpm run test:coverage
 
       - name: Upload coverage
-        if: matrix.node-version == 22
+        if: matrix.node-version == 22 && matrix.prettier-version == '3'
         uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

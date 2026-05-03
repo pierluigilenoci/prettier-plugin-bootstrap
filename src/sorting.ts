@@ -1,6 +1,7 @@
 import { sortClasses } from './class-order'
+import type { SortOptions } from './types'
 
-export function sortClassString(value: string): string {
+export function sortClassString(value: string, options?: SortOptions): string {
   if (!value || typeof value !== 'string') {
     return value
   }
@@ -15,10 +16,23 @@ export function sortClassString(value: string): string {
     return value
   }
 
-  const sorted = sortClasses(classes)
-
   const leadingWs = value.match(/^\s*/)![0]
   const trailingWs = value.match(/\s*$/)![0]
+
+  let toSort = classes
+  if (options?.preserveDuplicates === false) {
+    toSort = classes.filter((c, i) => classes.indexOf(c) === i)
+  }
+
+  const sorted = sortClasses(toSort)
+
+  if (options?.preserveWhitespace) {
+    const separators = trimmed.split(/\S+/).slice(1, -1)
+    const result = sorted
+      .map((cls, i) => (i < separators.length ? cls + separators[i] : cls))
+      .join('')
+    return `${leadingWs}${result}${trailingWs}`
+  }
 
   return `${leadingWs}${sorted.join(' ')}${trailingWs}`
 }

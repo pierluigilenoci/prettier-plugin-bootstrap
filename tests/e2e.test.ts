@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import * as prettier from 'prettier'
 import * as plugin from '../src/index'
+import { buildAttrMatcher } from '../src/index'
 
 async function format(code: string, parser: string, options?: Record<string, any>) {
   return prettier.format(code, {
@@ -223,6 +224,114 @@ describe('e2e — prettier.format() with plugin', () => {
       const input = 'const x = clsx("mt-3 container");\n'
       const result = await format(input, 'babel')
       expect(result).toContain('"mt-3 container"')
+    })
+  })
+
+  describe('regex bootstrapAttributes', () => {
+    it('matches attributes via regex pattern', async () => {
+      const input = '<div data-class="mt-3 container"></div>\n'
+      const result = await format(input, 'html', {
+        bootstrapAttributes: ['/^data-class/'],
+      })
+      expect(result).toContain('data-class="container mt-3"')
+    })
+
+    it('does not match non-matching regex', async () => {
+      const input = '<div title="mt-3 container"></div>\n'
+      const result = await format(input, 'html', {
+        bootstrapAttributes: ['/^data-/'],
+      })
+      expect(result).toContain('title="mt-3 container"')
+    })
+
+    it('supports mixed plain and regex attributes', async () => {
+      const input = '<div ngClass="mt-3 container" data-cls="p-3 row"></div>\n'
+      const result = await format(input, 'html', {
+        bootstrapAttributes: ['ngClass', '/^data-cls/'],
+      })
+      expect(result).toContain('ngClass="container mt-3"')
+      expect(result).toContain('data-cls="row p-3"')
+    })
+  })
+
+  describe('buildAttrMatcher', () => {
+    it('matches plain attributes', () => {
+      const matcher = buildAttrMatcher(['class', 'className'])
+      expect(matcher('class')).toBe(true)
+      expect(matcher('className')).toBe(true)
+      expect(matcher('id')).toBe(false)
+    })
+
+    it('matches regex patterns', () => {
+      const matcher = buildAttrMatcher(['/^data-class/'])
+      expect(matcher('data-class')).toBe(true)
+      expect(matcher('data-classes')).toBe(true)
+      expect(matcher('class')).toBe(false)
+    })
+
+    it('supports regex flags', () => {
+      const matcher = buildAttrMatcher(['/^CLASS$/i'])
+      expect(matcher('CLASS')).toBe(true)
+      expect(matcher('class')).toBe(true)
+      expect(matcher('Class')).toBe(true)
+    })
+  })
+
+  describe('prettier-bootstrap-ignore comment', () => {
+    it('skips sorting with HTML ignore comment', async () => {
+      const input = '<!-- prettier-bootstrap-ignore -->\n<div class="mt-3 container"></div>\n'
+      const result = await format(input, 'html')
+      expect(result).toContain('class="mt-3 container"')
+    })
+
+    it('skips sorting with JS single-line ignore comment', async () => {
+      const input =
+        '// prettier-bootstrap-ignore\nexport default () => <div className="mt-3 container"></div>;\n'
+      const result = await format(input, 'babel')
+      expect(result).toContain('className="mt-3 container"')
+    })
+
+    it('skips sorting with JS block ignore comment', async () => {
+      const input =
+        '/* prettier-bootstrap-ignore */\nexport default () => <div className="mt-3 container"></div>;\n'
+      const result = await format(input, 'babel')
+      expect(result).toContain('className="mt-3 container"')
+    })
+
+    it('sorts normally without ignore comment', async () => {
+      const input = '<div class="mt-3 container"></div>\n'
+      const result = await format(input, 'html')
+      expect(result).toContain('class="container mt-3"')
+    })
+  })
+
+  describe('bootstrapVersion option', () => {
+    it('accepts bootstrapVersion without error', async () => {
+      const input = '<div class="mt-3 container"></div>\n'
+      const result = await format(input, 'html', { bootstrapVersion: 5 })
+      expect(result).toContain('class="container mt-3"')
+    })
+  })
+
+  describe('bootstrapPreserveWhitespace option', () => {
+    it('preserves multi-space separators in JSX', async () => {
+      const input = 'export default () => <div className="mt-3  container"></div>;\n'
+      const result = await format(input, 'babel', { bootstrapPreserveWhitespace: true })
+      expect(result).toContain('className="container  mt-3"')
+    })
+  })
+
+  describe('bootstrapPreserveDuplicates option', () => {
+    it('removes duplicates when set to false', async () => {
+      const input = '<div class="mt-3 container mt-3"></div>\n'
+      const result = await format(input, 'html', { bootstrapPreserveDuplicates: false })
+      expect(result).toContain('class="container mt-3"')
+    })
+
+    it('preserves duplicates by default', async () => {
+      const input = '<div class="mt-3 container mt-3"></div>\n'
+      const result = await format(input, 'html')
+      expect(result).toContain('class="container mt-3 mt-3"')
     })
   })
 })

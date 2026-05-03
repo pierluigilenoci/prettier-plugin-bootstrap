@@ -23,6 +23,42 @@ describe('sortClassString', () => {
   it('sorts multiple classes', () => {
     expect(sortClassString('mt-3 container')).toBe('container mt-3')
   })
+
+  describe('preserveWhitespace option', () => {
+    it('preserves multi-space separators when enabled', () => {
+      expect(sortClassString('mt-3  container', { preserveWhitespace: true })).toBe(
+        'container  mt-3',
+      )
+    })
+
+    it('preserves tab separators', () => {
+      expect(sortClassString('mt-3\tcontainer', { preserveWhitespace: true })).toBe(
+        'container\tmt-3',
+      )
+    })
+
+    it('normalizes to single spaces when disabled (default)', () => {
+      expect(sortClassString('mt-3  container')).toBe('container mt-3')
+    })
+  })
+
+  describe('preserveDuplicates option', () => {
+    it('removes duplicates when set to false', () => {
+      expect(sortClassString('mt-3 container mt-3 p-2', { preserveDuplicates: false })).toBe(
+        'container mt-3 p-2',
+      )
+    })
+
+    it('preserves duplicates by default', () => {
+      expect(sortClassString('mt-3 container mt-3')).toBe('container mt-3 mt-3')
+    })
+
+    it('preserves duplicates when explicitly true', () => {
+      expect(sortClassString('mt-3 container mt-3', { preserveDuplicates: true })).toBe(
+        'container mt-3 mt-3',
+      )
+    })
+  })
 })
 
 describe('processHtmlAst — edge cases', () => {
@@ -400,6 +436,26 @@ describe('processSvelteAst', () => {
       },
     }
     processSvelteAst(ast, ['class'])
+    expect(ast.fragment.nodes[0].attributes[0].value[0].data).toBe('container mt-3')
+  })
+
+  it('accepts a function as attrMatcher', () => {
+    const ast = {
+      fragment: {
+        nodes: [
+          {
+            attributes: [
+              {
+                type: 'Attribute',
+                name: 'class',
+                value: [{ type: 'Text', data: 'mt-3 container', raw: 'mt-3 container' }],
+              },
+            ],
+          },
+        ],
+      },
+    }
+    processSvelteAst(ast, (name: string) => name === 'class')
     expect(ast.fragment.nodes[0].attributes[0].value[0].data).toBe('container mt-3')
   })
 })

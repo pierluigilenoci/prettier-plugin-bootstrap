@@ -1,4 +1,5 @@
 import { sortClassString } from './sorting'
+import type { SortOptions } from './types'
 
 const AST_KEYS = [
   'program',
@@ -61,11 +62,11 @@ function walk(node: any, visitor: (node: any) => void): void {
   }
 }
 
-function sortStringNode(node: any): void {
+function sortStringNode(node: any, sortOptions?: SortOptions): void {
   if (!node) return
 
   if (node.type === 'StringLiteral') {
-    const sorted = sortClassString(node.value)
+    const sorted = sortClassString(node.value, sortOptions)
     node.value = sorted
     if (node.extra) {
       node.extra.rawValue = sorted
@@ -75,7 +76,7 @@ function sortStringNode(node: any): void {
   }
 
   if (node.type === 'Literal' && typeof node.value === 'string') {
-    const sorted = sortClassString(node.value)
+    const sorted = sortClassString(node.value, sortOptions)
     node.value = sorted
     if (node.raw) {
       const quote = node.raw[0]
@@ -87,7 +88,7 @@ function sortStringNode(node: any): void {
   if (node.type === 'TemplateLiteral' && (!node.expressions || node.expressions.length === 0)) {
     for (const quasi of node.quasis) {
       if (quasi.value && typeof quasi.value.raw === 'string') {
-        const sorted = sortClassString(quasi.value.raw)
+        const sorted = sortClassString(quasi.value.raw, sortOptions)
         quasi.value.raw = sorted
         quasi.value.cooked = sorted
       }
@@ -95,12 +96,22 @@ function sortStringNode(node: any): void {
   }
 }
 
-export function processHtmlAst(ast: any, targetAttrs: string[], _targetFunctions?: string[]): any {
+export function processHtmlAst(
+  ast: any,
+  attrMatcher: ((name: string) => boolean) | string[],
+  _targetFunctions?: string[],
+  sortOptions?: SortOptions,
+): any {
+  const matchAttr =
+    typeof attrMatcher === 'function'
+      ? attrMatcher
+      : (name: string) => (attrMatcher as string[]).includes(name)
+
   walk(ast, (node) => {
     if (node.attrs && Array.isArray(node.attrs)) {
       for (const attr of node.attrs) {
-        if (targetAttrs.includes(attr.name) && typeof attr.value === 'string') {
-          attr.value = sortClassString(attr.value)
+        if (matchAttr(attr.name) && typeof attr.value === 'string') {
+          attr.value = sortClassString(attr.value, sortOptions)
         }
       }
     }
@@ -108,14 +119,14 @@ export function processHtmlAst(ast: any, targetAttrs: string[], _targetFunctions
     if (node.attributes && Array.isArray(node.attributes)) {
       for (const attr of node.attributes) {
         const name = attr.name || (attr.key && attr.key.value)
-        if (targetAttrs.includes(name) && attr.value) {
+        if (matchAttr(name) && attr.value) {
           if (typeof attr.value === 'string') {
             if (attr.kind && attr.kind !== 'quoted') continue
             if (attr.value.includes('${')) continue
-            attr.value = sortClassString(attr.value)
+            attr.value = sortClassString(attr.value, sortOptions)
           } else if (attr.value && typeof attr.value.value === 'string') {
             if (attr.value.value.includes('${')) continue
-            attr.value.value = sortClassString(attr.value.value)
+            attr.value.value = sortClassString(attr.value.value, sortOptions)
           }
         }
       }
@@ -127,17 +138,22 @@ export function processHtmlAst(ast: any, targetAttrs: string[], _targetFunctions
 
 export function processJsxAst(
   ast: any,
-  targetAttrs: string[],
+  attrMatcher: ((name: string) => boolean) | string[],
   targetFunctions: string[] = [],
+  sortOptions?: SortOptions,
 ): any {
+  const matchAttr =
+    typeof attrMatcher === 'function'
+      ? attrMatcher
+      : (name: string) => (attrMatcher as string[]).includes(name)
   const functionSet = new Set(targetFunctions)
 
   walk(ast, (node) => {
     if (node.type === 'JSXAttribute' || node.type === 'JSXSpreadAttribute') {
       const name = node.name && (node.name.name || node.name.value)
-      if (targetAttrs.includes(name) && node.value) {
+      if (matchAttr(name) && node.value) {
         if (node.value.type === 'StringLiteral' || node.value.type === 'Literal') {
-          const sorted = sortClassString(node.value.value)
+          const sorted = sortClassString(node.value.value, sortOptions)
           node.value.value = sorted
           if (node.value.extra) {
             node.value.extra.rawValue = sorted
@@ -155,7 +171,7 @@ export function processJsxAst(
       const callee = node.callee
       if (callee && callee.type === 'Identifier' && functionSet.has(callee.name)) {
         for (const arg of node.arguments || []) {
-          sortStringNode(arg)
+          sortStringNode(arg, sortOptions)
         }
       }
     }
@@ -183,20 +199,26 @@ function walkSvelte(node: any, visitor: (node: any) => void): void {
 
 export function processSvelteAst(
   ast: any,
-  targetAttrs: string[],
+  attrMatcher: ((name: string) => boolean) | string[],
   _targetFunctions?: string[],
+  sortOptions?: SortOptions,
 ): any {
+  const matchAttr =
+    typeof attrMatcher === 'function'
+      ? attrMatcher
+      : (name: string) => (attrMatcher as string[]).includes(name)
+
   walkSvelte(ast, (node) => {
     if (!node.attributes || !Array.isArray(node.attributes)) return
 
     for (const attr of node.attributes) {
       if (attr.type !== 'Attribute') continue
-      if (!targetAttrs.includes(attr.name)) continue
+      if (!matchAttr(attr.name)) continue
 
       if (Array.isArray(attr.value)) {
         for (const item of attr.value) {
           if (item.type === 'Text' && typeof item.data === 'string') {
-            const sorted = sortClassString(item.data)
+            const sorted = sortClassString(item.data, sortOptions)
             item.data = sorted
             if (typeof item.raw === 'string') {
               item.raw = sorted
