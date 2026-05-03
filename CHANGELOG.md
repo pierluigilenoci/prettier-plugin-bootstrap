@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.2.1...v0.3.0) (2026-05-03)
+
+
+### Features
+
+* ecosystem improvements — public API, new options, CJS, regex attrs ([9079811](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/9079811f98283283346ef25169115c10e28bf87a))
+* ecosystem improvements — public API, new options, CJS, regex attrs ([add9e36](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/add9e36dbc72d9ab1f39379fa13abb89cecfb955))
+
 ## [0.2.1](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.2.0...v0.2.1) (2026-05-02)
 
 
