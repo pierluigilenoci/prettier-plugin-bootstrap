@@ -602,6 +602,16 @@ describe('branch coverage — remaining edges', () => {
     expect(ast.attributes[0].value.value).toBe(42)
   })
 
+  it('processJsxAst skips JSXAttribute with non-string value type', () => {
+    const ast = {
+      type: 'JSXAttribute',
+      name: { name: 'className' },
+      value: { type: 'JSXExpressionContainer', expression: { type: 'Identifier', name: 'styles' } },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.value.type).toBe('JSXExpressionContainer')
+  })
+
   it('processJsxAst skips JSXAttribute with falsy name.name and falsy name.value', () => {
     const ast = {
       type: 'JSXAttribute',
