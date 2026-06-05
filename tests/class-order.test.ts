@@ -38,6 +38,16 @@ describe('classKey', () => {
     const [containerIdx] = classKey('container')
     expect(fluidIdx).toBeLessThan(containerIdx)
   })
+
+  it('resolves longest matching prefix when shorter prefix also matches', () => {
+    // 'text-decoration-' (idx 199) appears before 'text-' (idx 200) in CLASS_ORDER.
+    // Iterating ORDER_MAP: longer prefix is found first, then shorter — the false branch
+    // of `prefix.length > bestLen` is hit when the shorter is encountered second.
+    const [tdIdx] = classKey('text-decoration-underline')
+    const [tIdx] = classKey('text-center')
+    expect(tdIdx).not.toBe(tIdx)
+    expect(tdIdx).not.toBe(Infinity)
+  })
 })
 
 describe('sortClasses', () => {
