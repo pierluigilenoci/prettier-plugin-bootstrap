@@ -613,7 +613,6 @@ describe('branch coverage — remaining edges', () => {
   })
 
   it('walk skips node.body when it is a non-object truthy value', () => {
-    const visited: string[] = []
     const ast = {
       body: 'not-an-object',
       type: 'JSXAttribute',
