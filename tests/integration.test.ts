@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { sortClasses } from '../src/class-order'
+import { parsers } from '../src/index'
 
 describe('integration — realistic class lists', () => {
   it('handles a typical Bootstrap HTML class attribute value', () => {
@@ -49,5 +50,22 @@ describe('integration — realistic class lists', () => {
     const input = 'mb-3 form-control form-control-lg is-invalid'
     const sorted = sortClasses(input.split(/\s+/))
     expect(sorted.indexOf('form-control')).toBeLessThan(sorted.indexOf('mb-3'))
+  })
+})
+
+describe('parser wrapper — minimal parser coverage', () => {
+  it('uses wrapper locStart/locEnd/astFormat when parser lacks them', async () => {
+    const minimalParser = {
+      parse: async () => ({ type: 'root', attrs: [] }),
+    }
+    const fakePlugin = { parsers: { html: minimalParser } }
+    const result = await parsers.html.parse!('<div class="mt-3 container"></div>', {
+      plugins: [fakePlugin],
+      bootstrapAttributes: [],
+      bootstrapFunctions: [],
+      bootstrapPreserveWhitespace: false,
+      bootstrapPreserveDuplicates: true,
+    } as any)
+    expect(result).toBeDefined()
   })
 })

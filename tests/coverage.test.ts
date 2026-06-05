@@ -500,4 +500,166 @@ describe('branch coverage — remaining edges', () => {
     processSvelteAst(ast, ['class'])
     expect(ast.fragment.nodes[1]!.attributes[0].value[0].data).toBe('container mt-3')
   })
+
+  it('walk traverses node.body as object (non-array)', () => {
+    const ast = {
+      body: {
+        type: 'JSXAttribute',
+        name: { name: 'className' },
+        value: { type: 'StringLiteral', value: 'mt-3 container' },
+      },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.body.value.value).toBe('container mt-3')
+  })
+
+  it('sortStringNode handles Literal without raw field', () => {
+    const ast = {
+      type: 'JSXAttribute',
+      name: { name: 'className' },
+      value: { type: 'Literal', value: 'mt-3 container' },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.value.value).toBe('container mt-3')
+  })
+
+  it('sortStringNode handles TemplateLiteral quasi without value.raw', () => {
+    const ast = {
+      type: 'CallExpression',
+      callee: { type: 'Identifier', name: 'clsx' },
+      arguments: [
+        {
+          type: 'TemplateLiteral',
+          expressions: [],
+          quasis: [{ value: null }],
+        },
+      ],
+    }
+    processJsxAst(ast, ['className'], ['clsx'])
+    expect(ast.arguments[0].quasis[0].value).toBeNull()
+  })
+
+  it('processHtmlAst resolves attr.name when attr.key.value is undefined', () => {
+    const ast = {
+      attributes: [{ name: 'class', value: { value: 'mt-3 container' } }],
+    }
+    processHtmlAst(ast, ['class'])
+    expect(ast.attributes[0].value.value).toBe('container mt-3')
+  })
+
+  it('processJsxAst handles JSXAttribute with name.value (not name.name)', () => {
+    const ast = {
+      type: 'JSXAttribute',
+      name: { value: 'className' },
+      value: { type: 'StringLiteral', value: 'mt-3 container' },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.value.value).toBe('container mt-3')
+  })
+
+  it('processJsxAst skips JSXSpreadAttribute with null name', () => {
+    const ast = {
+      type: 'JSXSpreadAttribute',
+      argument: { type: 'Identifier', name: 'props' },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.argument.name).toBe('props')
+  })
+
+  it('processSvelteAst skips attribute with non-array value', () => {
+    const ast = {
+      fragment: {
+        nodes: [
+          {
+            attributes: [
+              {
+                type: 'Attribute',
+                name: 'class',
+                value: 'mt-3 container',
+              },
+            ],
+          },
+        ],
+      },
+    }
+    processSvelteAst(ast, ['class'])
+    expect(ast.fragment.nodes[0].attributes[0].value).toBe('mt-3 container')
+  })
+
+  it('processHtmlAst skips attr when both attr.name and attr.key.value are falsy', () => {
+    const ast = {
+      attributes: [{ key: { value: null }, value: { value: 'mt-3 container' } }],
+    }
+    processHtmlAst(ast, ['class'])
+    expect(ast.attributes[0].value.value).toBe('mt-3 container')
+  })
+
+  it('processHtmlAst skips attr.value object with non-string .value', () => {
+    const ast = {
+      attributes: [{ name: 'class', value: { value: 42 } }],
+    }
+    processHtmlAst(ast, ['class'])
+    expect(ast.attributes[0].value.value).toBe(42)
+  })
+
+  it('processJsxAst skips JSXAttribute with non-string value type', () => {
+    const ast = {
+      type: 'JSXAttribute',
+      name: { name: 'className' },
+      value: { type: 'JSXExpressionContainer', expression: { type: 'Identifier', name: 'styles' } },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.value.type).toBe('JSXExpressionContainer')
+  })
+
+  it('processJsxAst skips JSXAttribute with falsy name.name and falsy name.value', () => {
+    const ast = {
+      type: 'JSXAttribute',
+      name: { name: null, value: null },
+      value: { type: 'StringLiteral', value: 'mt-3 container' },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.value.value).toBe('mt-3 container')
+  })
+
+  it('walk skips node.body when it is a non-object truthy value', () => {
+    const ast = {
+      body: 'not-an-object',
+      type: 'JSXAttribute',
+      name: { name: 'className' },
+      value: { type: 'StringLiteral', value: 'mt-3 container' },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.value.value).toBe('container mt-3')
+  })
+
+  it('sortStringNode handles Literal with falsy raw field', () => {
+    const ast = {
+      type: 'JSXAttribute',
+      name: { name: 'className' },
+      value: { type: 'Literal', value: 'mt-3 container', raw: '' },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.value.value).toBe('container mt-3')
+  })
+
+  it('sortStringNode in CallExpression handles Literal without raw (false branch)', () => {
+    const ast = {
+      type: 'CallExpression',
+      callee: { type: 'Identifier', name: 'clsx' },
+      arguments: [{ type: 'Literal', value: 'mt-3 container' }],
+    }
+    processJsxAst(ast, ['className'], ['clsx'])
+    expect(ast.arguments[0].value).toBe('container mt-3')
+  })
+
+  it('processJsxAst handles JSXAttribute with name.name falsy but name.value set', () => {
+    const ast = {
+      type: 'JSXAttribute',
+      name: { name: '', value: 'className' },
+      value: { type: 'StringLiteral', value: 'mt-3 container' },
+    }
+    processJsxAst(ast, ['className'])
+    expect(ast.value.value).toBe('container mt-3')
+  })
 })
