@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.3.0...v0.3.1) (2026-06-14)
+
+
+### Bug Fixes
+
+* adjust branch coverage threshold for vitest v4 instrumentation ([6340fde](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/6340fde1f292a912c2a6e2f847416144a627bdc9))
+* remove unused variable in coverage test ([bf694f1](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/bf694f13fa58a43190b4c8bef13f4d7aab99ff2e))
+
 ## [0.3.0](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.2.1...v0.3.0) (2026-05-03)
 
 
