@@ -40,16 +40,54 @@ Add the plugin to your Prettier configuration:
 
 That's it! Your Bootstrap classes will now be automatically sorted on format.
 
-### Before
+### HTML
 
 ```html
+<!-- Before -->
 <div class="text-center p-3 container bg-primary text-white mb-4 rounded"></div>
+
+<!-- After -->
+<div class="container mb-4 p-3 text-center text-white bg-primary rounded"></div>
 ```
 
-### After
+### JSX / TSX
+
+```jsx
+// Before
+<button className="btn-lg mt-2 btn btn-primary d-flex align-items-center">Click</button>
+
+// After
+<button className="d-flex align-items-center mt-2 btn btn-primary btn-lg">Click</button>
+```
+
+### Vue
 
 ```html
-<div class="container mb-4 p-3 text-center text-white bg-primary rounded"></div>
+<!-- Before -->
+<div :class="['text-center', 'container', 'p-3']"></div>
+
+<!-- After -->
+<div :class="['container', 'p-3', 'text-center']"></div>
+```
+
+### Svelte
+
+```html
+<!-- Before -->
+<div class="text-white p-2 bg-dark d-flex"></div>
+
+<!-- After -->
+<div class="d-flex p-2 text-white bg-dark"></div>
+```
+
+### Astro
+
+```astro
+<!-- Before -->
+<div class="rounded text-sm p-4 card shadow"></div>
+
+<!-- After -->
+<div class="card p-4 rounded shadow text-sm"></div>
 ```
 
 ## Sorting Order
