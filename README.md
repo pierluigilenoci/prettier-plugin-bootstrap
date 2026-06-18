@@ -118,7 +118,63 @@ Unknown classes are preserved in their original relative order and placed after 
 | `bootstrapPreserveDuplicates` | `boolean`  | `true`  | Keep duplicate class names. Set to `false` to remove duplicates                                                      |
 | `bootstrapVersion`            | `int`      | `5`     | Bootstrap version (for future version-specific sorting rules)                                                        |
 
-### Example
+### `bootstrapAttributes`
+
+Sort classes in custom attributes beyond `class` / `className`:
+
+```html
+<!-- .prettierrc: { "bootstrapAttributes": ["ngClass"] } -->
+
+<!-- Before -->
+<div [ngClass]="'text-center p-3 container'"></div>
+
+<!-- After -->
+<div [ngClass]="'container p-3 text-center'"></div>
+```
+
+### `bootstrapFunctions`
+
+Sort class strings passed to utility functions like `clsx`:
+
+```jsx
+// .prettierrc: { "bootstrapFunctions": ["clsx"] }
+
+// Before
+clsx('btn-lg', 'mt-2', 'btn', 'btn-primary')
+
+// After
+clsx('mt-2', 'btn', 'btn-primary', 'btn-lg')
+```
+
+### `bootstrapPreserveWhitespace`
+
+Keep original whitespace between classes (default: normalise to single spaces):
+
+```html
+<!-- .prettierrc: { "bootstrapPreserveWhitespace": true } -->
+
+<!-- Before -->
+<div class="p-3   container  mt-2"></div>
+
+<!-- After (whitespace preserved) -->
+<div class="container  mt-2   p-3"></div>
+```
+
+### `bootstrapPreserveDuplicates`
+
+Remove duplicate class names by setting to `false` (default: `true`, keep duplicates):
+
+```html
+<!-- .prettierrc: { "bootstrapPreserveDuplicates": false } -->
+
+<!-- Before -->
+<div class="p-3 container p-3 mt-2"></div>
+
+<!-- After (duplicate p-3 removed) -->
+<div class="container mt-2 p-3"></div>
+```
+
+### Full example
 
 ```json
 {
