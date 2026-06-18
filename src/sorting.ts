@@ -16,8 +16,8 @@ export function sortClassString(value: string, options?: SortOptions): string {
     return value
   }
 
-  const leadingWs = value.match(/^\s*/)![0]
-  const trailingWs = value.match(/\s*$/)![0]
+  const leadingWs = value.slice(0, value.length - value.trimStart().length)
+  const trailingWs = value.slice(value.trimEnd().length)
 
   let toSort = classes
   if (options?.preserveDuplicates === false) {
