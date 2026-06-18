@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.3](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.3.2...v0.3.3) (2026-06-18)
+
+
+### Bug Fixes
+
+* add module and types fields to package.json for broader compatibility ([66dd863](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/66dd86344e941b956cca6712c2713960d60d1a1d))
+* add vite as explicit devDependency at &gt;=7.3.5 to fix CVEs ([c776519](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/c776519626c392581e09c35c65ced82a7db502cb))
+* replace regex with string ops to resolve CodeQL ReDoS alert ([2fc8497](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/2fc8497921e2839672ea5041e40c47d6c1b65dab))
+* resolve all open issues (security, CI, docs, package metadata) ([da9bd3d](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/da9bd3db1f33e9d5158b3ed44ac4f464edf7b6ab))
+* update SECURITY.md supported versions and add --provenance to publish ([cc3f0ca](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/cc3f0cafb610b91e178b2fe704db81b36016b0b6))
+
 ## [0.3.2](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.3.1...v0.3.2) (2026-06-18)
 
 
