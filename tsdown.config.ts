@@ -5,7 +5,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   platform: 'node',
   target: 'node20',
-  external: ['prettier'],
+  deps: { neverBundle: ['prettier'] },
   clean: true,
   outDir: 'dist',
 })
