@@ -16,6 +16,9 @@ You should receive a response within 72 hours. We will work with you to understa
 
 ## Supported Versions
 
+Only the latest release is actively supported with security fixes.
+
 | Version | Supported |
 | ------- | --------- |
-| 0.1.x   | Yes       |
+| 0.3.x   | Yes       |
+| < 0.3   | No        |

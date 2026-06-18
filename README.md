@@ -47,7 +47,7 @@ That's it! Your Bootstrap classes will now be automatically sorted on format.
 ### After
 
 ```html
-<div class="container bg-primary text-center text-white mb-4 p-3 rounded"></div>
+<div class="container mb-4 p-3 text-center text-white bg-primary rounded"></div>
 ```
 
 ## Sorting Order
