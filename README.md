@@ -215,7 +215,7 @@ pnpm run typecheck
 ## Compatibility
 
 - Prettier >= 3.0.0
-- Node.js >= 20
+- Node.js >= 20.19
 - Bootstrap 5 (class order)
 
 ## License
