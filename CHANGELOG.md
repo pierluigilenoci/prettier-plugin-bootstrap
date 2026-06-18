@@ -6,6 +6,15 @@
 ### Bug Fixes
 
 * update codeql-action from v3 to v4 ([99eada9](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/99eada9d8a4c2bf248fd2c1b0c08e1684a51cde1))
+* update engines.node to >=20.19 (required by rolldown native bindings) ([41b3ed7](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/41b3ed7))
+
+
+### Miscellaneous
+
+* update all devDependencies to latest versions (eslint, typescript 6, tsdown, vitest, prettier, @types/node, typescript-eslint) ([8e0c83d](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/8e0c83d))
+* add pnpm.overrides to force esbuild >=0.28.1 (fixes Dependabot security alerts #4 and #5) ([8e0c83d](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/8e0c83d))
+* configure Renovate with automerge for minor and patch updates ([52a5233](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/52a5233))
+* bump packageManager to pnpm@10.34.3 ([41b3ed7](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/41b3ed7))
 
 ## [0.3.1](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.3.0...v0.3.1) (2026-06-14)
 
