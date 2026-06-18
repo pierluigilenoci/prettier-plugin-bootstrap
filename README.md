@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/actions/workflows/ci.yml/badge.svg)](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/prettier-plugin-bootstrap)](https://www.npmjs.com/package/prettier-plugin-bootstrap)
+[![npm downloads](https://img.shields.io/npm/dw/prettier-plugin-bootstrap)](https://www.npmjs.com/package/prettier-plugin-bootstrap)
+[![Node.js](https://img.shields.io/node/v/prettier-plugin-bootstrap)](https://nodejs.org)
 [![codecov](https://codecov.io/gh/pierluigilenoci/prettier-plugin-bootstrap/branch/main/graph/badge.svg)](https://codecov.io/gh/pierluigilenoci/prettier-plugin-bootstrap)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
