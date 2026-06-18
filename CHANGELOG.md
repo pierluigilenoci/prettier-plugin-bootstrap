@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.3.1...v0.3.2) (2026-06-18)
+
+
+### Bug Fixes
+
+* update codeql-action from v3 to v4 ([99eada9](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/99eada9d8a4c2bf248fd2c1b0c08e1684a51cde1))
+
 ## [0.3.1](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.3.0...v0.3.1) (2026-06-14)
 
 
