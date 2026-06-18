@@ -6,7 +6,6 @@ settings:
 
 overrides:
   esbuild: '>=0.28.1'
-  vite: '>=7.3.5'
 
 importers:
 
@@ -37,7 +36,7 @@ importers:
         specifier: ^8.61.1
         version: 8.61.1(eslint@10.5.0(jiti@2.6.1))(typescript@6.0.3)
       vite:
-        specifier: 7.3.5
+        specifier: ~7.3.5
         version: 7.3.5(@types/node@25.9.3)(jiti@2.6.1)
       vitest:
         specifier: ^4.1.9
@@ -787,7 +786,7 @@ packages:
     resolution: {integrity: sha512-EVkXzBjrPGM+cK8/ANWgBrkUCfJfb38/EfTSO8h7pWvKkyPkpWxvR7BkD2MyItMF62C97zAEoqdpUixwR/e+Rw==}
     peerDependencies:
       msw: ^2.4.9
-      vite: '>=7.3.5'
+      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
     peerDependenciesMeta:
       msw:
         optional: true
@@ -1394,7 +1393,7 @@ packages:
       '@vitest/ui': 4.1.9
       happy-dom: '*'
       jsdom: '*'
-      vite: '>=7.3.5'
+      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
     peerDependenciesMeta:
       '@edge-runtime/vm':
         optional: true
