@@ -247,6 +247,30 @@ sorter.sort('mt-3 container p-2') // "container mt-3 p-2"
 sorter.sortClasses(['mt-3', 'container']) // ["container", "mt-3"]
 ```
 
+## Editor Integration
+
+No editor-specific configuration is needed — the plugin works through Prettier. Enable "Format on Save" in your editor and Prettier will sort classes automatically.
+
+### VS Code
+
+1. Install the [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension.
+2. Add to `.vscode/settings.json`:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+```
+
+### WebStorm / IntelliJ
+
+Go to **Settings → Languages & Frameworks → Prettier** and enable **Run on save**.
+
+### Neovim
+
+Use [conform.nvim](https://github.com/stevearc/conform.nvim) or [null-ls](https://github.com/jose-elias-alvarez/null-ls.nvim) with Prettier as the formatter, then enable format-on-save in your config.
+
 ## Supported Parsers
 
 - `html` — HTML files
