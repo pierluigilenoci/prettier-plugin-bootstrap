@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.4.0](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.3.3...v0.4.0) (2026-06-22)
+
+
+### Features
+
+* add Bootstrap 4 class order support ([ef2fc24](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/ef2fc245e2ab4b0347e0dac17cc70ff92be0b31e)), closes [#46](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/46)
+* add bootstrapSortTemplateLiterals option for opt-out of template literal sorting ([9b1695e](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/9b1695ec8c8dc8f15d19cd13de4673a9c7ac74ea))
+* add eslint-plugin-bootstrap-order companion package ([3629ba2](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/3629ba2949abdb2328f3cf99efd89669f461e8cf)), closes [#56](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/56)
+* add inline ignore comment support (prettier-bootstrap-ignore-next) ([3638cb4](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/3638cb41b899f8561b36ed71787a59783999d4c1)), closes [#47](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/47)
+* add missing Bootstrap 5.3 classes and regression tests ([b0ae7b9](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/b0ae7b93863f715e1fc82ea4dae4e4f8b7a095a0)), closes [#58](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/58)
+* add online playground via GitHub Pages ([fccb79e](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/fccb79e2e34a8d7afc6c8b98445262541567b705)), closes [#45](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/45)
+* export CLASS_ORDER, BREAKPOINTS, and classKey from sorter public API ([6e4e66d](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/6e4e66d5e09cdc5ecea0464b218f0b91804225d1)), closes [#49](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/49)
+* sort static segments of template literals with expressions in JSX ([e9ea794](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/e9ea7948ea9ec8fe23829efd4e1539884afc4b41)), closes [#48](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/48)
+
+
+### Bug Fixes
+
+* createSorter bootstrapVersion consistency + bootstrapSortTemplateLiterals opt-out ([4b303e3](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/4b303e3a516044f0ed392eeff4e2c31938ee7707))
+* createSorter respects bootstrapVersion in sortClasses() ([b43e2ab](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/b43e2ab35148bc6cccc711a08c7f69a6b59f86fc))
+* make Bootstrap upstream check reliable ([75e3a0e](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/75e3a0ed71f4df22be56d9bf5c99bd173e10719d))
+* remove prettier-bootstrap-ignore-line (fragile, unreliable for HTML) ([184012c](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/184012c636ee683de0c6febf34269b4bfc2c22ba))
+* store Bootstrap version in bootstrap-version.json, read with JSON.parse ([4a76258](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/4a76258a5458b11dbd0094d7322d1df314a92b8a))
+
 ## [0.3.3](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.3.2...v0.3.3) (2026-06-18)
 
 
