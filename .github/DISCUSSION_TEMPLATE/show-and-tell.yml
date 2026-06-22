@@ -1,0 +1,12 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share how you use `prettier-plugin-bootstrap` in your project. Config snippets, framework setups, and tips are all welcome.
+  - type: textarea
+    id: setup
+    attributes:
+      label: Your setup
+      description: Framework, config, and any interesting details about how you use the plugin.
+    validations:
+      required: true

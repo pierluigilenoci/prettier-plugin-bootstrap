@@ -27,13 +27,25 @@
   },
   "keywords": [
     "prettier",
+    "prettier-plugin",
     "plugin",
     "bootstrap",
+    "bootstrap5",
+    "bootstrap-5",
     "css",
     "class",
-    "sorting",
+    "class-sorter",
     "class-order",
-    "formatter"
+    "sorting",
+    "sort-classes",
+    "formatter",
+    "html",
+    "jsx",
+    "react",
+    "vue",
+    "svelte",
+    "astro",
+    "angular"
   ],
   "repository": {
     "type": "git",
