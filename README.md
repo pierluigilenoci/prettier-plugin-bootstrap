@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".github/assets/banner.svg" alt="prettier-plugin-bootstrap" width="900"/>
+</p>
+
 # prettier-plugin-bootstrap
 
 [![CI](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/actions/workflows/ci.yml/badge.svg)](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/actions/workflows/ci.yml)
