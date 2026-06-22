@@ -1,5 +1,8 @@
 import type { SortKey } from './types'
 
+// Bootstrap version this CLASS_ORDER reflects. Bump when adding/removing classes after a Bootstrap release.
+// @bootstrap-version 5.3.8
+
 export const BREAKPOINTS = ['sm', 'md', 'lg', 'xl', 'xxl'] as const
 
 const RESPONSIVE_RE = new RegExp(`^(.+?)-(${BREAKPOINTS.join('|')})-(.+)$`)

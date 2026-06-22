@@ -16,28 +16,31 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Get latest Bootstrap version
-        id: bootstrap
+      - name: Get latest Bootstrap version from npm
+        id: latest
         run: |
-          latest=$(curl -s https://registry.npmjs.org/bootstrap/latest | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).version))")
-          echo "latest=$latest" >> "$GITHUB_OUTPUT"
-          echo "Latest Bootstrap version: $latest"
+          version=$(curl -s https://registry.npmjs.org/bootstrap/latest | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).version))")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Latest Bootstrap on npm: $version"
 
-      - name: Get pinned Bootstrap version in class-order.ts
+      - name: Get pinned version from class-order.ts
         id: pinned
         run: |
-          pinned=$(grep -m1 'Bootstrap' src/class-order.ts | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
-          echo "pinned=$pinned" >> "$GITHUB_OUTPUT"
-          echo "Pinned Bootstrap version: $pinned"
+          version=$(grep -oP '(?<=@bootstrap-version )\S+' src/class-order.ts || echo "")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Pinned in class-order.ts: ${version:-not found}"
 
       - name: Compare versions
         id: compare
         run: |
-          latest="${{ steps.bootstrap.outputs.latest }}"
-          pinned="${{ steps.pinned.outputs.pinned }}"
-          if [ "$pinned" = "unknown" ] || [ "$latest" != "$pinned" ]; then
+          latest="${{ steps.latest.outputs.version }}"
+          pinned="${{ steps.pinned.outputs.version }}"
+          if [ -z "$pinned" ]; then
             echo "needs_update=true" >> "$GITHUB_OUTPUT"
-            echo "Bootstrap upstream is $latest, class-order.ts references $pinned"
+            echo "No @bootstrap-version tag found in class-order.ts — treating as outdated"
+          elif [ "$latest" != "$pinned" ]; then
+            echo "needs_update=true" >> "$GITHUB_OUTPUT"
+            echo "Upstream $latest differs from pinned $pinned"
           else
             echo "needs_update=false" >> "$GITHUB_OUTPUT"
             echo "class-order.ts is up to date with Bootstrap $latest"
@@ -48,19 +51,17 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const latest = '${{ steps.bootstrap.outputs.latest }}';
-            const pinned = '${{ steps.pinned.outputs.pinned }}';
+            const latest = '${{ steps.latest.outputs.version }}';
+            const pinned = '${{ steps.pinned.outputs.version }}' || 'unknown';
             const title = `chore: update CLASS_ORDER for Bootstrap ${latest}`;
 
-            // Check if an open issue with this title already exists
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
               labels: 'bootstrap-sync',
             });
-            const exists = issues.some(i => i.title === title);
-            if (exists) {
+            if (issues.some(i => i.title === title)) {
               console.log('Issue already open, skipping.');
               return;
             }
@@ -71,15 +72,15 @@ jobs:
               title,
               labels: ['bootstrap-sync', 'enhancement'],
               body: [
-                `Bootstrap **${latest}** has been released (current CLASS_ORDER references **${pinned}**).`,
+                `Bootstrap **${latest}** has been released. The \`CLASS_ORDER\` in \`src/class-order.ts\` currently references **${pinned}**.`,
                 '',
                 '## Steps',
                 '',
-                '1. Review the Bootstrap changelog for new, renamed, or removed utility classes.',
+                '1. Review the [Bootstrap changelog](https://github.com/twbs/bootstrap/releases/tag/v' + latest + ') for new, renamed, or removed utility classes.',
                 '2. Update `src/class-order.ts` to reflect any changes.',
-                '3. Update the Bootstrap version reference comment at the top of `src/class-order.ts`.',
+                '3. Bump `// @bootstrap-version` at the top of `src/class-order.ts` to `' + latest + '`.',
                 '4. Run `pnpm run test` to verify coverage.',
                 '',
-                '_This issue was opened automatically by the [Check Bootstrap upstream](${{ github.server_url }}/${{ github.repository }}/actions/workflows/check-bootstrap-upstream.yml) workflow._',
+                '_Opened automatically by the [Check Bootstrap upstream](${{ github.server_url }}/${{ github.repository }}/actions/workflows/check-bootstrap-upstream.yml) workflow._',
               ].join('\n'),
             });
