@@ -1,50 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 160" width="740" height="160">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 180" width="760" height="180">
   <defs>
-    <linearGradient id="shield-grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#9061d0"/>
-      <stop offset="100%" stop-color="#6f42c1"/>
+    <linearGradient id="bs-logo-a" x1="76.079" x2="523.48" y1="10.798" y2="365.945" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9013fe"/>
+      <stop offset="1" stop-color="#6610f2"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
-      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#3d1f7a" flood-opacity="0.45"/>
+    <linearGradient id="bs-logo-b" x1="193.508" x2="293.514" y1="109.74" y2="278.872" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#f1e5fc"/>
+    </linearGradient>
+    <filter id="bs-logo-c" width="197" height="249" x="161.901" y="83.457" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+      <feOffset dy="4"/>
+      <feGaussianBlur stdDeviation="8"/>
+      <feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/>
+      <feBlend in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
     </filter>
   </defs>
 
-  <!-- Bootstrap shield shape -->
-  <g transform="translate(24, 16)" filter="url(#shadow)">
-    <path d="
-      M64,0
-      C64,0 128,16 128,56
-      C128,96 128,104 108,120
-      C88,136 64,128 64,128
-      C64,128 40,136 20,120
-      C0,104 0,96 0,56
-      C0,16 64,0 64,0
-      Z
-    " fill="url(#shield-grad)"/>
-    <text
-      x="64" y="90"
-      font-family="Georgia, 'Times New Roman', serif"
-      font-size="78"
-      font-weight="700"
-      fill="white"
-      text-anchor="middle"
-    >B</text>
+  <!-- Bootstrap official logo scaled to 160px height, centered vertically -->
+  <g transform="translate(10, 10) scale(0.392)">
+    <path fill="url(#bs-logo-a)" d="M56.481 53.32C55.515 25.58 77.128 0 106.342 0h299.353c29.214 0 50.827 25.58 49.861 53.32-.928 26.647.277 61.165 8.964 89.31 8.715 28.232 23.411 46.077 47.48 48.37v26c-24.069 2.293-38.765 20.138-47.48 48.37-8.687 28.145-9.892 62.663-8.964 89.311.966 27.739-20.647 53.319-49.861 53.319H106.342c-29.214 0-50.827-25.58-49.86-53.319.927-26.648-.278-61.166-8.966-89.311C38.802 237.138 24.07 219.293 0 217v-26c24.069-2.293 38.802-20.138 47.516-48.37 8.688-28.145 9.893-62.663 8.965-89.31z"/>
+    <path fill="url(#bs-logo-b)" filter="url(#bs-logo-c)" stroke="#fff" d="M267.103 312.457c47.297 0 75.798-23.158 75.798-61.355 0-28.873-20.336-49.776-50.532-53.085v-1.203c22.185-3.609 39.594-24.211 39.594-47.219 0-32.783-25.882-54.138-65.322-54.138h-88.74v217h89.202zm-54.692-189.48h45.911c24.958 0 39.131 11.128 39.131 31.279 0 21.505-16.484 33.535-46.372 33.535h-38.67v-64.814zm0 161.961v-71.431h45.602c32.661 0 49.608 12.03 49.608 35.49 0 23.459-16.484 35.941-47.605 35.941h-47.605z"/>
   </g>
 
   <!-- Plugin name -->
   <text
-    x="186" y="68"
+    x="225" y="75"
     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
-    font-size="28"
+    font-size="30"
     font-weight="300"
-    fill="#6f42c1"
+    fill="#6610f2"
     letter-spacing="1"
   >prettier-plugin-</text>
   <text
-    x="186" y="112"
+    x="225" y="122"
     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
-    font-size="40"
+    font-size="44"
     font-weight="700"
-    fill="#3d1f7a"
+    fill="#3d0d8f"
   >bootstrap</text>
 </svg>
