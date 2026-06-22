@@ -3,6 +3,7 @@ import type { Options } from 'prettier'
 export interface SortOptions {
   preserveWhitespace?: boolean
   preserveDuplicates?: boolean
+  bootstrapVersion?: number
 }
 
 export interface BootstrapPluginOptions extends Options {

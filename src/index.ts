@@ -128,6 +128,7 @@ function createParserWrapper(
       const sortOptions: SortOptions = {
         preserveWhitespace: options.bootstrapPreserveWhitespace ?? false,
         preserveDuplicates: options.bootstrapPreserveDuplicates ?? true,
+        bootstrapVersion: options.bootstrapVersion ?? 5,
       }
 
       return processAst(ast, attrMatcher, targetFunctions, sortOptions, text)
