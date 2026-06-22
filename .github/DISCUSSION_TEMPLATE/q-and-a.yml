@@ -1,0 +1,17 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask anything about configuring or using `prettier-plugin-bootstrap`. For bugs, use the [bug report](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/new?template=bug_report.md) template instead.
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What do you want to know?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Your `.prettierrc` config, framework (HTML/JSX/Vue/etc.), and relevant code snippet.
