@@ -253,6 +253,26 @@ describe('processJsxAst — bootstrapFunctions', () => {
     expect(ast.arguments[0].quasis[1].value.raw).toBe(' mt-3 p-2')
   })
 
+  it('skips TemplateLiteral with expressions when sortTemplateLiterals is false', () => {
+    const ast = {
+      type: 'CallExpression',
+      callee: { type: 'Identifier', name: 'clsx' },
+      arguments: [
+        {
+          type: 'TemplateLiteral',
+          expressions: [{ type: 'Identifier', name: 'x' }],
+          quasis: [
+            { value: { raw: 'text-white container ', cooked: 'text-white container ' } },
+            { value: { raw: ' mt-3 p-2', cooked: ' mt-3 p-2' } },
+          ],
+        },
+      ],
+    }
+    processJsxAst(ast, ['className'], ['clsx'], { sortTemplateLiterals: false })
+    expect(ast.arguments[0].quasis[0].value.raw).toBe('text-white container ')
+    expect(ast.arguments[0].quasis[1].value.raw).toBe(' mt-3 p-2')
+  })
+
   it('ignores CallExpression with non-matching callee', () => {
     const ast = {
       type: 'CallExpression',
