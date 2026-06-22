@@ -138,6 +138,26 @@ Or block comment style:
 /* prettier-bootstrap-ignore */
 ```
 
+### Inline Ignore (single element)
+
+To skip sorting for a single element while keeping sorting active for the rest of the file, add an ignore comment on the line **before** the element:
+
+```html
+<!-- prettier-bootstrap-ignore-next -->
+<div class="mt-3 container">This element will NOT be sorted</div>
+
+<div class="mt-3 container">This one WILL be sorted → container mt-3</div>
+```
+
+For JS/TS files:
+
+```jsx
+// prettier-bootstrap-ignore-next
+<div className="mt-3 container">Not sorted</div>
+
+<div className="mt-3 container">Sorted → container mt-3</div>
+```
+
 ## Public Sorting API
 
 For programmatic use (linters, codemods, build tools), import the sorter directly:

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { sortClasses } from '../src/class-order'
 import { parsers } from '../src/index'
+import { processHtmlAst, processJsxAst } from '../src/traversal'
 
 describe('integration — realistic class lists', () => {
   it('handles a typical Bootstrap HTML class attribute value', () => {
@@ -67,5 +68,58 @@ describe('parser wrapper — minimal parser coverage', () => {
       bootstrapPreserveDuplicates: true,
     } as any)
     expect(result).toBeDefined()
+  })
+})
+
+describe('inline ignore comments', () => {
+  const matchClass = (name: string) => name === 'class'
+
+  it('sorts normally without ignore comment', () => {
+    const sourceText = '<div class="mt-3 container"></div>'
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      range: [0, sourceText.length],
+    }
+    processHtmlAst(ast, matchClass, [], {}, sourceText)
+    expect(ast.attrs[0].value).toBe('container mt-3')
+  })
+
+  it('skips sorting with prettier-bootstrap-ignore-next on previous line (HTML)', () => {
+    const sourceText =
+      '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      range: [nodeStart, sourceText.length],
+    }
+    processHtmlAst(ast, matchClass, [], {}, sourceText)
+    expect(ast.attrs[0].value).toBe('mt-3 container')
+  })
+
+  it('skips sorting with prettier-bootstrap-ignore-line on same line (HTML)', () => {
+    const sourceText =
+      '<div class="mt-3 container"> <!-- prettier-bootstrap-ignore-line --></div>'
+    const nodeStart = 0
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      range: [nodeStart, sourceText.length],
+    }
+    processHtmlAst(ast, matchClass, [], {}, sourceText)
+    expect(ast.attrs[0].value).toBe('mt-3 container')
+  })
+
+  it('skips JSXAttribute sorting with prettier-bootstrap-ignore-next', () => {
+    const sourceText =
+      '// prettier-bootstrap-ignore-next\n<div className="mt-3 container" />'
+    const nodeStart = sourceText.indexOf('<div')
+    const jsxAttrNode = {
+      type: 'JSXAttribute',
+      name: { name: 'className' },
+      value: { type: 'StringLiteral', value: 'mt-3 container' },
+      range: [nodeStart, sourceText.length],
+    }
+    const ast = { type: 'JSXElement', attributes: [jsxAttrNode], range: [nodeStart, sourceText.length] }
+    processJsxAst(ast, matchClass, [], {}, sourceText)
+    expect(jsxAttrNode.value.value).toBe('mt-3 container')
   })
 })

@@ -1,6 +1,21 @@
 import { sortClassString } from './sorting'
 import type { SortOptions } from './types'
 
+function getNodeStart(node: any): number {
+  return node.range?.[0] ?? node.start ?? node.sourceSpan?.start?.offset ?? -1
+}
+
+function isIgnored(sourceText: string, nodeStart: number): boolean {
+  if (nodeStart < 0 || !sourceText) return false
+  const lookback = sourceText.slice(Math.max(0, nodeStart - 500), nodeStart)
+  const lines = lookback.split('\n')
+  const prevLine = lines.at(-2) ?? ''
+  return (
+    /prettier-bootstrap-ignore-next/.test(prevLine) ||
+    /prettier-bootstrap-ignore-line/.test(lines.at(-1) ?? '')
+  )
+}
+
 const AST_KEYS = [
   'program',
   'expression',
@@ -101,6 +116,7 @@ export function processHtmlAst(
   attrMatcher: ((name: string) => boolean) | string[],
   _targetFunctions?: string[],
   sortOptions?: SortOptions,
+  sourceText?: string,
 ): any {
   const matchAttr =
     typeof attrMatcher === 'function'
@@ -111,6 +127,7 @@ export function processHtmlAst(
     if (node.attrs && Array.isArray(node.attrs)) {
       for (const attr of node.attrs) {
         if (matchAttr(attr.name) && typeof attr.value === 'string') {
+          if (isIgnored(sourceText ?? '', getNodeStart(node))) continue
           attr.value = sortClassString(attr.value, sortOptions)
         }
       }
@@ -120,6 +137,7 @@ export function processHtmlAst(
       for (const attr of node.attributes) {
         const name = attr.name || (attr.key && attr.key.value)
         if (matchAttr(name) && attr.value) {
+          if (isIgnored(sourceText ?? '', getNodeStart(node))) continue
           if (typeof attr.value === 'string') {
             if (attr.kind && attr.kind !== 'quoted') continue
             if (attr.value.includes('${')) continue
@@ -141,6 +159,7 @@ export function processJsxAst(
   attrMatcher: ((name: string) => boolean) | string[],
   targetFunctions: string[] = [],
   sortOptions?: SortOptions,
+  sourceText?: string,
 ): any {
   const matchAttr =
     typeof attrMatcher === 'function'
@@ -152,6 +171,7 @@ export function processJsxAst(
     if (node.type === 'JSXAttribute' || node.type === 'JSXSpreadAttribute') {
       const name = node.name && (node.name.name || node.name.value)
       if (matchAttr(name) && node.value) {
+        if (isIgnored(sourceText ?? '', getNodeStart(node))) return
         if (node.value.type === 'StringLiteral' || node.value.type === 'Literal') {
           const sorted = sortClassString(node.value.value, sortOptions)
           node.value.value = sorted
@@ -170,6 +190,7 @@ export function processJsxAst(
     if (node.type === 'CallExpression' && functionSet.size > 0) {
       const callee = node.callee
       if (callee && callee.type === 'Identifier' && functionSet.has(callee.name)) {
+        if (isIgnored(sourceText ?? '', getNodeStart(node))) return
         for (const arg of node.arguments || []) {
           sortStringNode(arg, sortOptions)
         }
@@ -202,6 +223,7 @@ export function processSvelteAst(
   attrMatcher: ((name: string) => boolean) | string[],
   _targetFunctions?: string[],
   sortOptions?: SortOptions,
+  sourceText?: string,
 ): any {
   const matchAttr =
     typeof attrMatcher === 'function'
@@ -214,6 +236,7 @@ export function processSvelteAst(
     for (const attr of node.attributes) {
       if (attr.type !== 'Attribute') continue
       if (!matchAttr(attr.name)) continue
+      if (isIgnored(sourceText ?? '', getNodeStart(node))) continue
 
       if (Array.isArray(attr.value)) {
         for (const item of attr.value) {
