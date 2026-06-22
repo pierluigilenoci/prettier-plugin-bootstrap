@@ -1,4 +1,5 @@
 import { sortClasses, CLASS_ORDER, BREAKPOINTS, classKey } from './class-order'
+import { sortClassesV4 } from './class-order-v4'
 import { sortClassString } from './sorting'
 import type { SortOptions } from './types'
 
@@ -8,6 +9,7 @@ export interface Sorter {
 }
 
 export function createSorter(options?: SortOptions): Sorter {
+  const sortFn = options?.bootstrapVersion === 4 ? sortClassesV4 : sortClasses
   return {
     sort: (classString) => sortClassString(classString, options),
     sortClasses: (classes) => {
@@ -15,7 +17,7 @@ export function createSorter(options?: SortOptions): Sorter {
         options?.preserveDuplicates === false
           ? classes.filter((c, i) => classes.indexOf(c) === i)
           : classes
-      return sortClasses(input)
+      return sortFn(input)
     },
   }
 }

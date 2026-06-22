@@ -116,13 +116,14 @@ Unknown classes are preserved in their original relative order and placed after 
 
 ## Options
 
-| Option                        | Type       | Default | Description                                                                                                          |
-| ----------------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
-| `bootstrapAttributes`         | `string[]` | `[]`    | Additional HTML attributes to sort (beyond `class` and `className`). Supports regex patterns (e.g. `/^data-class/`). |
-| `bootstrapFunctions`          | `string[]` | `[]`    | Function names whose arguments are class lists (e.g. `clsx`, `classNames`)                                           |
-| `bootstrapPreserveWhitespace` | `boolean`  | `false` | Preserve original whitespace between classes instead of normalizing to single spaces                                 |
-| `bootstrapPreserveDuplicates` | `boolean`  | `true`  | Keep duplicate class names. Set to `false` to remove duplicates                                                      |
-| `bootstrapVersion`            | `int`      | `5`     | Bootstrap version (for future version-specific sorting rules)                                                        |
+| Option                          | Type       | Default | Description                                                                                                          |
+| ------------------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `bootstrapAttributes`           | `string[]` | `[]`    | Additional HTML attributes to sort (beyond `class` and `className`). Supports regex patterns (e.g. `/^data-class/`). |
+| `bootstrapFunctions`            | `string[]` | `[]`    | Function names whose arguments are class lists (e.g. `clsx`, `classNames`)                                           |
+| `bootstrapPreserveWhitespace`   | `boolean`  | `false` | Preserve original whitespace between classes instead of normalizing to single spaces                                 |
+| `bootstrapPreserveDuplicates`   | `boolean`  | `true`  | Keep duplicate class names. Set to `false` to remove duplicates                                                      |
+| `bootstrapVersion`              | `int`      | `5`     | Bootstrap version (`4` or `5`)                                                                                       |
+| `bootstrapSortTemplateLiterals` | `boolean`  | `true`  | Sort static class segments inside JSX template literals that contain expressions. Set to `false` to skip them        |
 
 ### `bootstrapAttributes`
 
@@ -178,6 +179,24 @@ Remove duplicate class names by setting to `false` (default: `true`, keep duplic
 
 <!-- After (duplicate p-3 removed) -->
 <div class="container mt-2 p-3"></div>
+```
+
+### `bootstrapSortTemplateLiterals`
+
+By default, static class segments inside JSX template literals with expressions are sorted independently:
+
+```jsx
+// Before
+<div className={`text-white container ${condition} mt-3 p-2`} />
+
+// After (each static segment sorted independently)
+<div className={`container text-white ${condition} mt-3 p-2`} />
+```
+
+Set to `false` to restore the pre-v0.4.0 behaviour and skip template literals with expressions entirely:
+
+```json
+{ "bootstrapSortTemplateLiterals": false }
 ```
 
 ### Full example

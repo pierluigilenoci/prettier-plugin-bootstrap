@@ -50,6 +50,13 @@ export const options = {
     category: 'Bootstrap',
     description: 'Bootstrap version (for future version-specific sorting rules).',
   },
+  bootstrapSortTemplateLiterals: {
+    type: 'boolean' as const,
+    default: true,
+    category: 'Bootstrap',
+    description:
+      'Sort static class segments inside JSX template literals that contain expressions. Set to false to skip template literals with expressions entirely.',
+  },
 }
 
 function buildAttrMatcher(allAttrs: string[]): (name: string) => boolean {
@@ -129,6 +136,7 @@ function createParserWrapper(
         preserveWhitespace: options.bootstrapPreserveWhitespace ?? false,
         preserveDuplicates: options.bootstrapPreserveDuplicates ?? true,
         bootstrapVersion: options.bootstrapVersion ?? 5,
+        sortTemplateLiterals: options.bootstrapSortTemplateLiterals ?? true,
       }
 
       return processAst(ast, attrMatcher, targetFunctions, sortOptions, text)

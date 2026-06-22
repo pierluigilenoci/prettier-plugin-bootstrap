@@ -98,6 +98,8 @@ function sortStringNode(node: any, sortOptions?: SortOptions): void {
   }
 
   if (node.type === 'TemplateLiteral') {
+    const hasExpressions = node.expressions && node.expressions.length > 0
+    if (hasExpressions && sortOptions?.sortTemplateLiterals === false) return
     for (const quasi of node.quasis) {
       if (quasi.value && typeof quasi.value.raw === 'string') {
         const sorted = sortClassString(quasi.value.raw, sortOptions)
