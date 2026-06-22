@@ -31,6 +31,9 @@ jobs:
           - node-version: 22
             prettier-version: '3'
             latest-prettier: true
+          - node-version: 24
+            prettier-version: '3'
+            latest-prettier: true
 
     steps:
       - uses: actions/checkout@v6
