@@ -15,9 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6
-
       - name: Use Node.js 22
         uses: actions/setup-node@v6
         with:
@@ -29,29 +26,18 @@ jobs:
           script: |
             const fs = require('fs')
 
-            // Read pinned version from class-order.ts
-            const source = fs.readFileSync('src/class-order.ts', 'utf8')
-            const match = source.match(/@bootstrap-version\s+(\S+)/)
-            const pinned = match ? match[1] : null
+            const { version: pinned } = JSON.parse(fs.readFileSync('bootstrap-version.json', 'utf8'))
 
-            if (!pinned) {
-              core.setFailed('No @bootstrap-version tag found in src/class-order.ts')
-              return
-            }
-
-            // Fetch latest Bootstrap version from npm registry
             const res = await fetch('https://registry.npmjs.org/bootstrap/latest')
             const { version: latest } = await res.json()
 
-            core.info(`Pinned: ${pinned}`)
-            core.info(`Latest: ${latest}`)
+            core.info(`Pinned: ${pinned} — Latest: ${latest}`)
 
             if (latest === pinned) {
-              core.info('class-order.ts is up to date.')
+              core.info('bootstrap-version.json is up to date.')
               return
             }
 
-            // Check if an issue for this version already exists
             const title = `chore: update CLASS_ORDER for Bootstrap ${latest}`
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
@@ -71,13 +57,13 @@ jobs:
               title,
               labels: ['bootstrap-sync', 'enhancement'],
               body: [
-                `Bootstrap **${latest}** has been released. The \`CLASS_ORDER\` in \`src/class-order.ts\` currently references **${pinned}**.`,
+                `Bootstrap **${latest}** has been released. \`bootstrap-version.json\` currently references **${pinned}**.`,
                 '',
                 '## Steps',
                 '',
                 `1. Review the [Bootstrap changelog](https://github.com/twbs/bootstrap/releases/tag/v${latest}) for new, renamed, or removed utility classes.`,
                 '2. Update `src/class-order.ts` to reflect any changes.',
-                `3. Bump \`// @bootstrap-version\` at the top of \`src/class-order.ts\` to \`${latest}\`.`,
+                `3. Bump \`version\` in \`bootstrap-version.json\` to \`${latest}\`.`,
                 '4. Run `pnpm run test` to verify coverage.',
                 '',
                 `_Opened automatically by the [Check Bootstrap upstream](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/check-bootstrap-upstream.yml) workflow._`,
