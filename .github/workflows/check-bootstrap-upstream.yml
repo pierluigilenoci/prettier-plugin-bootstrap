@@ -1,0 +1,85 @@
+name: Check Bootstrap upstream
+
+on:
+  schedule:
+    # Run weekly on Mondays at 08:00 UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-bootstrap-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Get latest Bootstrap version
+        id: bootstrap
+        run: |
+          latest=$(curl -s https://registry.npmjs.org/bootstrap/latest | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).version))")
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "Latest Bootstrap version: $latest"
+
+      - name: Get pinned Bootstrap version in class-order.ts
+        id: pinned
+        run: |
+          pinned=$(grep -m1 'Bootstrap' src/class-order.ts | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
+          echo "pinned=$pinned" >> "$GITHUB_OUTPUT"
+          echo "Pinned Bootstrap version: $pinned"
+
+      - name: Compare versions
+        id: compare
+        run: |
+          latest="${{ steps.bootstrap.outputs.latest }}"
+          pinned="${{ steps.pinned.outputs.pinned }}"
+          if [ "$pinned" = "unknown" ] || [ "$latest" != "$pinned" ]; then
+            echo "needs_update=true" >> "$GITHUB_OUTPUT"
+            echo "Bootstrap upstream is $latest, class-order.ts references $pinned"
+          else
+            echo "needs_update=false" >> "$GITHUB_OUTPUT"
+            echo "class-order.ts is up to date with Bootstrap $latest"
+          fi
+
+      - name: Open issue if update needed
+        if: steps.compare.outputs.needs_update == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const latest = '${{ steps.bootstrap.outputs.latest }}';
+            const pinned = '${{ steps.pinned.outputs.pinned }}';
+            const title = `chore: update CLASS_ORDER for Bootstrap ${latest}`;
+
+            // Check if an open issue with this title already exists
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'bootstrap-sync',
+            });
+            const exists = issues.some(i => i.title === title);
+            if (exists) {
+              console.log('Issue already open, skipping.');
+              return;
+            }
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              labels: ['bootstrap-sync', 'enhancement'],
+              body: [
+                `Bootstrap **${latest}** has been released (current CLASS_ORDER references **${pinned}**).`,
+                '',
+                '## Steps',
+                '',
+                '1. Review the Bootstrap changelog for new, renamed, or removed utility classes.',
+                '2. Update `src/class-order.ts` to reflect any changes.',
+                '3. Update the Bootstrap version reference comment at the top of `src/class-order.ts`.',
+                '4. Run `pnpm run test` to verify coverage.',
+                '',
+                '_This issue was opened automatically by the [Check Bootstrap upstream](${{ github.server_url }}/${{ github.repository }}/actions/workflows/check-bootstrap-upstream.yml) workflow._',
+              ].join('\n'),
+            });
