@@ -68,4 +68,9 @@ describe('Bootstrap 4 class order', () => {
     const sorted = sortClassesV4(['d-md-flex', 'd-flex', 'd-lg-none'])
     expect(sorted).toEqual(['d-flex', 'd-md-flex', 'd-lg-none'])
   })
+
+  it('preserves original order for two unknown classes with same key (tiebreaker branch)', () => {
+    const sorted = sortClassesV4(['acme-b', 'acme-a'])
+    expect(sorted).toEqual(['acme-b', 'acme-a'])
+  })
 })

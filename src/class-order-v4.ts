@@ -330,7 +330,6 @@ export function sortClassesV4(classes: string[]): string[] {
   annotated.sort((a, b) => {
     if (a.key[0] !== b.key[0]) return a.key[0] - b.key[0]
     if (a.key[1] !== b.key[1]) return a.key[1] - b.key[1]
-    /* v8 ignore next */
     return a.orig - b.orig
   })
 
