@@ -41,7 +41,7 @@ jobs:
       - name: Copy dist to playground
         run: |
           mkdir -p playground/dist
-          cp dist/index.mjs playground/dist/index.mjs
+          cp dist/*.mjs playground/dist/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
