@@ -123,8 +123,11 @@ export function processHtmlAst(
   walk(ast, (node) => {
     if (node.attrs && Array.isArray(node.attrs)) {
       for (const attr of node.attrs) {
-        if (matchAttr(attr.name) && typeof attr.value === 'string') {
-          if (isIgnored(sourceText ?? '', getNodeStart(node))) continue
+        if (
+          matchAttr(attr.name) &&
+          typeof attr.value === 'string' &&
+          !isIgnored(sourceText ?? '', getNodeStart(node))
+        ) {
           attr.value = sortClassString(attr.value, sortOptions)
         }
       }
@@ -133,8 +136,7 @@ export function processHtmlAst(
     if (node.attributes && Array.isArray(node.attributes)) {
       for (const attr of node.attributes) {
         const name = attr.name || (attr.key && attr.key.value)
-        if (matchAttr(name) && attr.value) {
-          if (isIgnored(sourceText ?? '', getNodeStart(node))) continue
+        if (matchAttr(name) && attr.value && !isIgnored(sourceText ?? '', getNodeStart(node))) {
           if (typeof attr.value === 'string') {
             if (attr.kind && attr.kind !== 'quoted') continue
             if (attr.value.includes('${')) continue
@@ -167,9 +169,7 @@ export function processJsxAst(
   walk(ast, (node) => {
     if (node.type === 'JSXAttribute' || node.type === 'JSXSpreadAttribute') {
       const name = node.name && (node.name.name || node.name.value)
-      if (matchAttr(name) && node.value) {
-        /* istanbul ignore next */
-        if (isIgnored(sourceText ?? '', getNodeStart(node))) return
+      if (matchAttr(name) && node.value && !isIgnored(sourceText ?? '', getNodeStart(node))) {
         if (node.value.type === 'StringLiteral' || node.value.type === 'Literal') {
           const sorted = sortClassString(node.value.value, sortOptions)
           node.value.value = sorted
@@ -187,8 +187,12 @@ export function processJsxAst(
 
     if (node.type === 'CallExpression' && functionSet.size > 0) {
       const callee = node.callee
-      if (callee && callee.type === 'Identifier' && functionSet.has(callee.name)) {
-        if (isIgnored(sourceText ?? '', getNodeStart(node))) return
+      if (
+        callee &&
+        callee.type === 'Identifier' &&
+        functionSet.has(callee.name) &&
+        !isIgnored(sourceText ?? '', getNodeStart(node))
+      ) {
         for (const arg of node.arguments || []) {
           sortStringNode(arg, sortOptions)
         }
@@ -235,7 +239,6 @@ export function processSvelteAst(
       if (attr.type !== 'Attribute') continue
       if (!matchAttr(attr.name)) continue
       if (isIgnored(sourceText ?? '', getNodeStart(node))) continue
-
       if (Array.isArray(attr.value)) {
         for (const item of attr.value) {
           if (item.type === 'Text' && typeof item.data === 'string') {
