@@ -95,17 +95,6 @@ describe('inline ignore comments', () => {
     expect(ast.attrs[0].value).toBe('mt-3 container')
   })
 
-  it('skips sorting with prettier-bootstrap-ignore-line on same line (HTML)', () => {
-    const sourceText = '<div class="mt-3 container"> <!-- prettier-bootstrap-ignore-line --></div>'
-    const nodeStart = 0
-    const ast = {
-      attrs: [{ name: 'class', value: 'mt-3 container' }],
-      range: [nodeStart, sourceText.length],
-    }
-    processHtmlAst(ast, matchClass, [], {}, sourceText)
-    expect(ast.attrs[0].value).toBe('mt-3 container')
-  })
-
   it('skips JSXAttribute sorting with prettier-bootstrap-ignore-next', () => {
     const sourceText = '// prettier-bootstrap-ignore-next\n<div className="mt-3 container" />'
     const nodeStart = sourceText.indexOf('<div')

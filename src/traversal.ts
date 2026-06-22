@@ -10,10 +10,7 @@ function isIgnored(sourceText: string, nodeStart: number): boolean {
   const lookback = sourceText.slice(Math.max(0, nodeStart - 500), nodeStart)
   const lines = lookback.split('\n')
   const prevLine = lines.at(-2) ?? ''
-  return (
-    /prettier-bootstrap-ignore-next/.test(prevLine) ||
-    /prettier-bootstrap-ignore-line/.test(lines.at(-1) ?? '')
-  )
+  return /prettier-bootstrap-ignore-next/.test(prevLine)
 }
 
 const AST_KEYS = [
