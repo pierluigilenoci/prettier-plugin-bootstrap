@@ -32,6 +32,9 @@ jobs:
             prettier-version: '3'
             latest-prettier: true
           - node-version: 24
+            prettier-version: '3.0.0'
+            latest-prettier: false
+          - node-version: 24
             prettier-version: '3'
             latest-prettier: true
 
