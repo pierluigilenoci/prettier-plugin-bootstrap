@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { sortClassesV4, classKeyV4, CLASS_ORDER_V4, BREAKPOINTS_V4 } from '../src/class-order-v4'
 import { sortClassString } from '../src/sorting'
+import { createSorter } from '../src/sorter'
 
 describe('Bootstrap 4 class order', () => {
   it('sorts Bootstrap 4 layout classes correctly', () => {
@@ -79,5 +80,18 @@ describe('Bootstrap 4 class order', () => {
     const [floatIdx] = classKeyV4('float-start')
     expect(floatLeftIdx).not.toBe(Infinity)
     expect(floatLeftIdx).not.toBe(floatIdx)
+  })
+})
+
+describe('createSorter bootstrapVersion consistency', () => {
+  it('sort() and sortClasses() produce consistent results with bootstrapVersion: 4', () => {
+    const sorter = createSorter({ bootstrapVersion: 4 })
+
+    const input = 'mr-3 container ml-2'
+    const fromSort = sorter.sort(input)
+    const fromSortClasses = sorter.sortClasses(input.split(' ')).join(' ')
+
+    expect(fromSort).toBe(fromSortClasses)
+    expect(fromSort.indexOf('container')).toBeLessThan(fromSort.indexOf('ml-2'))
   })
 })
