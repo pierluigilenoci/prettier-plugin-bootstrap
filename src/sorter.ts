@@ -1,4 +1,4 @@
-import { sortClasses } from './class-order'
+import { sortClasses, CLASS_ORDER, BREAKPOINTS, classKey } from './class-order'
 import { sortClassString } from './sorting'
 import type { SortOptions } from './types'
 
@@ -20,5 +20,5 @@ export function createSorter(options?: SortOptions): Sorter {
   }
 }
 
-export { sortClasses, sortClassString }
+export { sortClasses, sortClassString, CLASS_ORDER, BREAKPOINTS, classKey }
 export type { SortOptions }
