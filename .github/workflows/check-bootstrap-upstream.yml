@@ -2,7 +2,6 @@ name: Check Bootstrap upstream
 
 on:
   schedule:
-    # Run weekly on Mondays at 08:00 UTC
     - cron: '0 8 * * 1'
   workflow_dispatch:
 
@@ -16,54 +15,54 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Get latest Bootstrap version from npm
-        id: latest
-        run: |
-          version=$(curl -s https://registry.npmjs.org/bootstrap/latest | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).version))")
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "Latest Bootstrap on npm: $version"
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
 
-      - name: Get pinned version from class-order.ts
-        id: pinned
-        run: |
-          version=$(grep -oP '(?<=@bootstrap-version )\S+' src/class-order.ts || echo "")
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "Pinned in class-order.ts: ${version:-not found}"
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
 
-      - name: Compare versions
-        id: compare
-        run: |
-          latest="${{ steps.latest.outputs.version }}"
-          pinned="${{ steps.pinned.outputs.version }}"
-          if [ -z "$pinned" ]; then
-            echo "needs_update=true" >> "$GITHUB_OUTPUT"
-            echo "No @bootstrap-version tag found in class-order.ts — treating as outdated"
-          elif [ "$latest" != "$pinned" ]; then
-            echo "needs_update=true" >> "$GITHUB_OUTPUT"
-            echo "Upstream $latest differs from pinned $pinned"
-          else
-            echo "needs_update=false" >> "$GITHUB_OUTPUT"
-            echo "class-order.ts is up to date with Bootstrap $latest"
-          fi
-
-      - name: Open issue if update needed
-        if: steps.compare.outputs.needs_update == 'true'
+      - name: Check Bootstrap version and open issue if outdated
         uses: actions/github-script@v7
         with:
           script: |
-            const latest = '${{ steps.latest.outputs.version }}';
-            const pinned = '${{ steps.pinned.outputs.version }}' || 'unknown';
-            const title = `chore: update CLASS_ORDER for Bootstrap ${latest}`;
+            const fs = require('fs')
 
+            // Read pinned version from class-order.ts
+            const source = fs.readFileSync('src/class-order.ts', 'utf8')
+            const match = source.match(/@bootstrap-version\s+(\S+)/)
+            const pinned = match ? match[1] : null
+
+            if (!pinned) {
+              core.setFailed('No @bootstrap-version tag found in src/class-order.ts')
+              return
+            }
+
+            // Fetch latest Bootstrap version from npm registry
+            const res = await fetch('https://registry.npmjs.org/bootstrap/latest')
+            const { version: latest } = await res.json()
+
+            core.info(`Pinned: ${pinned}`)
+            core.info(`Latest: ${latest}`)
+
+            if (latest === pinned) {
+              core.info('class-order.ts is up to date.')
+              return
+            }
+
+            // Check if an issue for this version already exists
+            const title = `chore: update CLASS_ORDER for Bootstrap ${latest}`
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
               labels: 'bootstrap-sync',
-            });
+            })
+
             if (issues.some(i => i.title === title)) {
-              console.log('Issue already open, skipping.');
-              return;
+              core.info('Issue already open, skipping.')
+              return
             }
 
             await github.rest.issues.create({
@@ -76,11 +75,13 @@ jobs:
                 '',
                 '## Steps',
                 '',
-                '1. Review the [Bootstrap changelog](https://github.com/twbs/bootstrap/releases/tag/v' + latest + ') for new, renamed, or removed utility classes.',
+                `1. Review the [Bootstrap changelog](https://github.com/twbs/bootstrap/releases/tag/v${latest}) for new, renamed, or removed utility classes.`,
                 '2. Update `src/class-order.ts` to reflect any changes.',
-                '3. Bump `// @bootstrap-version` at the top of `src/class-order.ts` to `' + latest + '`.',
+                `3. Bump \`// @bootstrap-version\` at the top of \`src/class-order.ts\` to \`${latest}\`.`,
                 '4. Run `pnpm run test` to verify coverage.',
                 '',
-                '_Opened automatically by the [Check Bootstrap upstream](${{ github.server_url }}/${{ github.repository }}/actions/workflows/check-bootstrap-upstream.yml) workflow._',
+                `_Opened automatically by the [Check Bootstrap upstream](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/check-bootstrap-upstream.yml) workflow._`,
               ].join('\n'),
-            });
+            })
+
+            core.info(`Issue created: ${title}`)
