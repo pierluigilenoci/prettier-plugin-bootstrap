@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import * as prettier from 'prettier'
 import * as pluginSvelte from 'prettier-plugin-svelte'
-// prettier-plugin-astro ships no type declarations; use require instead
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pluginAstro = require('prettier-plugin-astro')
+import * as pluginAstro from 'prettier-plugin-astro'
 import * as plugin from '../src/index'
 
 describe('e2e — Svelte parser (via prettier-plugin-svelte)', () => {
