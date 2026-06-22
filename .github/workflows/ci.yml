@@ -82,6 +82,7 @@ jobs:
           files: coverage/lcov.info
 
       - name: Publish dry-run
+        if: ${{ matrix.node-version == 22 && matrix.latest-prettier }}
         run: pnpm publish --dry-run --no-git-checks
 
   bundle-size:
