@@ -1,10 +1,6 @@
 import type { Rule } from 'eslint'
 import { sortClassString } from 'prettier-plugin-bootstrap/sorter'
 
-function normalizeValue(raw: string): string {
-  return raw.slice(1, -1)
-}
-
 const sortClasses: Rule.RuleModule = {
   meta: {
     type: 'suggestion',
@@ -23,15 +19,10 @@ const sortClasses: Rule.RuleModule = {
       JSXAttribute(node) {
         if (!node.name || !node.value) return
         const attrName =
-          typeof node.name.name === 'string'
-            ? node.name.name
-            : node.name.name?.name ?? ''
+          typeof node.name.name === 'string' ? node.name.name : (node.name.name?.name ?? '')
         if (attrName !== 'className' && attrName !== 'class') return
 
-        if (
-          node.value.type === 'Literal' &&
-          typeof node.value.value === 'string'
-        ) {
+        if (node.value.type === 'Literal' && typeof node.value.value === 'string') {
           const raw = context.getSourceCode().getText(node.value)
           const quote = raw[0]
           const value = node.value.value
