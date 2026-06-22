@@ -663,3 +663,44 @@ describe('branch coverage — remaining edges', () => {
     expect(ast.value.value).toBe('container mt-3')
   })
 })
+
+describe('inline ignore — coverage branches', () => {
+  it('sorts normally when sourceText is empty (isIgnored returns false)', () => {
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      range: [0, 30],
+    }
+    processHtmlAst(ast, ['class'], [], {}, '')
+    expect(ast.attrs[0].value).toBe('container mt-3')
+  })
+
+  it('sorts normally when nodeStart is -1 (no range/start/sourceSpan)', () => {
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+    }
+    processHtmlAst(ast, ['class'], [], {}, 'some source')
+    expect(ast.attrs[0].value).toBe('container mt-3')
+  })
+
+  it('uses node.start when node.range is absent', () => {
+    const sourceText = '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      start: nodeStart,
+    }
+    processHtmlAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.attrs[0].value).toBe('mt-3 container')
+  })
+
+  it('uses node.sourceSpan.start.offset when range and start are absent', () => {
+    const sourceText = '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      sourceSpan: { start: { offset: nodeStart } },
+    }
+    processHtmlAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.attrs[0].value).toBe('mt-3 container')
+  })
+})
