@@ -1,7 +1,13 @@
+<p align="center">
+  <img src=".github/assets/banner.svg" alt="prettier-plugin-bootstrap" width="900"/>
+</p>
+
 # prettier-plugin-bootstrap
 
 [![CI](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/actions/workflows/ci.yml/badge.svg)](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/prettier-plugin-bootstrap)](https://www.npmjs.com/package/prettier-plugin-bootstrap)
+[![npm downloads](https://img.shields.io/npm/dw/prettier-plugin-bootstrap)](https://www.npmjs.com/package/prettier-plugin-bootstrap)
+[![Node.js](https://img.shields.io/node/v/prettier-plugin-bootstrap)](https://nodejs.org)
 [![codecov](https://codecov.io/gh/pierluigilenoci/prettier-plugin-bootstrap/branch/main/graph/badge.svg)](https://codecov.io/gh/pierluigilenoci/prettier-plugin-bootstrap)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -40,16 +46,54 @@ Add the plugin to your Prettier configuration:
 
 That's it! Your Bootstrap classes will now be automatically sorted on format.
 
-### Before
+### HTML
 
 ```html
+<!-- Before -->
 <div class="text-center p-3 container bg-primary text-white mb-4 rounded"></div>
+
+<!-- After -->
+<div class="container mb-4 p-3 text-center text-white bg-primary rounded"></div>
 ```
 
-### After
+### JSX / TSX
+
+```jsx
+// Before
+<button className="btn-lg mt-2 btn btn-primary d-flex align-items-center">Click</button>
+
+// After
+<button className="d-flex align-items-center mt-2 btn btn-primary btn-lg">Click</button>
+```
+
+### Vue
 
 ```html
-<div class="container mb-4 p-3 text-center text-white bg-primary rounded"></div>
+<!-- Before -->
+<div :class="['text-center', 'container', 'p-3']"></div>
+
+<!-- After -->
+<div :class="['container', 'p-3', 'text-center']"></div>
+```
+
+### Svelte
+
+```html
+<!-- Before -->
+<div class="text-white p-2 bg-dark d-flex"></div>
+
+<!-- After -->
+<div class="d-flex p-2 text-white bg-dark"></div>
+```
+
+### Astro
+
+```astro
+<!-- Before -->
+<div class="rounded text-sm p-4 card shadow"></div>
+
+<!-- After -->
+<div class="card p-4 rounded shadow text-sm"></div>
 ```
 
 ## Sorting Order
@@ -80,7 +124,63 @@ Unknown classes are preserved in their original relative order and placed after 
 | `bootstrapPreserveDuplicates` | `boolean`  | `true`  | Keep duplicate class names. Set to `false` to remove duplicates                                                      |
 | `bootstrapVersion`            | `int`      | `5`     | Bootstrap version (for future version-specific sorting rules)                                                        |
 
-### Example
+### `bootstrapAttributes`
+
+Sort classes in custom attributes beyond `class` / `className`:
+
+```html
+<!-- .prettierrc: { "bootstrapAttributes": ["ngClass"] } -->
+
+<!-- Before -->
+<div [ngClass]="'text-center p-3 container'"></div>
+
+<!-- After -->
+<div [ngClass]="'container p-3 text-center'"></div>
+```
+
+### `bootstrapFunctions`
+
+Sort class strings passed to utility functions like `clsx`:
+
+```jsx
+// .prettierrc: { "bootstrapFunctions": ["clsx"] }
+
+// Before
+clsx('btn-lg', 'mt-2', 'btn', 'btn-primary')
+
+// After
+clsx('mt-2', 'btn', 'btn-primary', 'btn-lg')
+```
+
+### `bootstrapPreserveWhitespace`
+
+Keep original whitespace between classes (default: normalise to single spaces):
+
+```html
+<!-- .prettierrc: { "bootstrapPreserveWhitespace": true } -->
+
+<!-- Before -->
+<div class="p-3   container  mt-2"></div>
+
+<!-- After (whitespace preserved) -->
+<div class="container  mt-2   p-3"></div>
+```
+
+### `bootstrapPreserveDuplicates`
+
+Remove duplicate class names by setting to `false` (default: `true`, keep duplicates):
+
+```html
+<!-- .prettierrc: { "bootstrapPreserveDuplicates": false } -->
+
+<!-- Before -->
+<div class="p-3 container p-3 mt-2"></div>
+
+<!-- After (duplicate p-3 removed) -->
+<div class="container mt-2 p-3"></div>
+```
+
+### Full example
 
 ```json
 {
@@ -152,6 +252,30 @@ const sorter = createSorter({ preserveDuplicates: false })
 sorter.sort('mt-3 container p-2') // "container mt-3 p-2"
 sorter.sortClasses(['mt-3', 'container']) // ["container", "mt-3"]
 ```
+
+## Editor Integration
+
+No editor-specific configuration is needed — the plugin works through Prettier. Enable "Format on Save" in your editor and Prettier will sort classes automatically.
+
+### VS Code
+
+1. Install the [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extension.
+2. Add to `.vscode/settings.json`:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+```
+
+### WebStorm / IntelliJ
+
+Go to **Settings → Languages & Frameworks → Prettier** and enable **Run on save**.
+
+### Neovim
+
+Use [conform.nvim](https://github.com/stevearc/conform.nvim) or [null-ls](https://github.com/jose-elias-alvarez/null-ls.nvim) with Prettier as the formatter, then enable format-on-save in your config.
 
 ## Supported Parsers
 
