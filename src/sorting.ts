@@ -1,4 +1,5 @@
 import { sortClasses } from './class-order'
+import { sortClassesV4 } from './class-order-v4'
 import type { SortOptions } from './types'
 
 export function sortClassString(value: string, options?: SortOptions): string {
@@ -24,7 +25,8 @@ export function sortClassString(value: string, options?: SortOptions): string {
     toSort = classes.filter((c, i) => classes.indexOf(c) === i)
   }
 
-  const sorted = sortClasses(toSort)
+  const sortFn = options?.bootstrapVersion === 4 ? sortClassesV4 : sortClasses
+  const sorted = sortFn(toSort)
 
   if (options?.preserveWhitespace) {
     const separators = trimmed.split(/\S+/).slice(1, -1)

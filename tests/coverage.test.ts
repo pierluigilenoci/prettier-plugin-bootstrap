@@ -233,7 +233,7 @@ describe('processJsxAst — bootstrapFunctions', () => {
     expect(ast.arguments[0].quasis[0].value.cooked).toBe('container mt-3')
   })
 
-  it('ignores TemplateLiteral with expressions', () => {
+  it('sorts static segments of TemplateLiteral with expressions', () => {
     const ast = {
       type: 'CallExpression',
       callee: { type: 'Identifier', name: 'clsx' },
@@ -242,14 +242,15 @@ describe('processJsxAst — bootstrapFunctions', () => {
           type: 'TemplateLiteral',
           expressions: [{ type: 'Identifier', name: 'x' }],
           quasis: [
-            { value: { raw: 'mt-3 ', cooked: 'mt-3 ' } },
-            { value: { raw: ' container', cooked: ' container' } },
+            { value: { raw: 'text-white container ', cooked: 'text-white container ' } },
+            { value: { raw: ' mt-3 p-2', cooked: ' mt-3 p-2' } },
           ],
         },
       ],
     }
     processJsxAst(ast, ['className'], ['clsx'])
-    expect(ast.arguments[0].quasis[0].value.raw).toBe('mt-3 ')
+    expect(ast.arguments[0].quasis[0].value.raw).toBe('container text-white ')
+    expect(ast.arguments[0].quasis[1].value.raw).toBe(' mt-3 p-2')
   })
 
   it('ignores CallExpression with non-matching callee', () => {
@@ -661,5 +662,103 @@ describe('branch coverage — remaining edges', () => {
     }
     processJsxAst(ast, ['className'])
     expect(ast.value.value).toBe('container mt-3')
+  })
+
+  it('sortStringNode skips unknown node types (false branch of TemplateLiteral check)', () => {
+    const ast = {
+      type: 'CallExpression',
+      callee: { type: 'Identifier', name: 'clsx' },
+      arguments: [{ type: 'Identifier', name: 'myClasses' }],
+    }
+    processJsxAst(ast, ['className'], ['clsx'])
+    expect(ast.arguments[0].name).toBe('myClasses')
+  })
+})
+
+describe('inline ignore — coverage branches', () => {
+  it('sorts normally when sourceText is empty (isIgnored returns false)', () => {
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      range: [0, 30],
+    }
+    processHtmlAst(ast, ['class'], [], {}, '')
+    expect(ast.attrs[0].value).toBe('container mt-3')
+  })
+
+  it('sorts normally when nodeStart is -1 (no range/start/sourceSpan)', () => {
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+    }
+    processHtmlAst(ast, ['class'], [], {}, 'some source')
+    expect(ast.attrs[0].value).toBe('container mt-3')
+  })
+
+  it('uses node.start when node.range is absent', () => {
+    const sourceText = '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      start: nodeStart,
+    }
+    processHtmlAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.attrs[0].value).toBe('mt-3 container')
+  })
+
+  it('uses node.sourceSpan.start.offset when range and start are absent', () => {
+    const sourceText = '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      sourceSpan: { start: { offset: nodeStart } },
+    }
+    processHtmlAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.attrs[0].value).toBe('mt-3 container')
+  })
+
+  it('skips node.attributes path when prettier-bootstrap-ignore-next is set (line 137)', () => {
+    const sourceText = '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      attributes: [{ name: 'class', value: 'mt-3 container' }],
+      range: [nodeStart, sourceText.length],
+    }
+    processHtmlAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.attributes[0].value).toBe('mt-3 container')
+  })
+
+  it('skips CallExpression path when prettier-bootstrap-ignore-next is set (line 190)', () => {
+    const sourceText = '// prettier-bootstrap-ignore-next\nclsx("mt-3 container")'
+    const nodeStart = sourceText.indexOf('clsx')
+    const ast = {
+      type: 'CallExpression',
+      callee: { type: 'Identifier', name: 'clsx' },
+      arguments: [{ type: 'StringLiteral', value: 'mt-3 container' }],
+      range: [nodeStart, sourceText.length],
+    }
+    processJsxAst(ast, ['className'], ['clsx'], {}, sourceText)
+    expect(ast.arguments[0].value).toBe('mt-3 container')
+  })
+
+  it('skips Svelte attribute when prettier-bootstrap-ignore-next is set (line 236)', () => {
+    const sourceText = '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      fragment: {
+        nodes: [
+          {
+            attributes: [
+              {
+                type: 'Attribute',
+                name: 'class',
+                value: [{ type: 'Text', data: 'mt-3 container', raw: 'mt-3 container' }],
+              },
+            ],
+            range: [nodeStart, sourceText.length],
+          },
+        ],
+      },
+    }
+    processSvelteAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.fragment.nodes[0].attributes[0].value[0].data).toBe('mt-3 container')
   })
 })

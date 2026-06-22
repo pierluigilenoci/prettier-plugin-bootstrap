@@ -1,20 +1,27 @@
 import type { SortKey } from './types'
 
-export const BREAKPOINTS = ['sm', 'md', 'lg', 'xl', 'xxl'] as const
+export const BREAKPOINTS_V4 = ['sm', 'md', 'lg', 'xl'] as const
 
-const RESPONSIVE_RE = new RegExp(`^(.+?)-(${BREAKPOINTS.join('|')})-(.+)$`)
+const RESPONSIVE_RE_V4 = new RegExp(`^(.+?)-(${BREAKPOINTS_V4.join('|')})-(.+)$`)
 
-export const CLASS_ORDER: readonly string[] = [
+// Bootstrap 4 class order — mirrors the structure of class-order.ts for Bootstrap 5.
+// Key differences from Bootstrap 5:
+//   - Uses ml-/mr-/pl-/pr- instead of ms-/me-/ps-/pe-
+//   - Uses float-left/float-right instead of float-start/float-end
+//   - Uses font-weight-/font-style- instead of fw-/fst-
+//   - Includes sr-only, embed-responsive, jumbotron, media (removed in Bootstrap 5)
+//   - Does not include gap-*, vstack, hstack, z-*, object-fit-*, overflow-x/y-*, placeholder
+export const CLASS_ORDER_V4: readonly string[] = [
   // ── Layout ──────────────────────────────────────────────────
   'container-fluid',
   'container-sm',
   'container-md',
   'container-lg',
   'container-xl',
-  'container-xxl',
   'container',
   'row',
   'row-cols-',
+  'no-gutters',
   'col-auto',
   'col-1',
   'col-2',
@@ -30,9 +37,6 @@ export const CLASS_ORDER: readonly string[] = [
   'col-12',
   'col',
   'offset-',
-  'g-',
-  'gx-',
-  'gy-',
 
   // ── Reboot / Typography ─────────────────────────────────────
   'h1',
@@ -63,6 +67,7 @@ export const CLASS_ORDER: readonly string[] = [
   'caption-top',
 
   // ── Forms ───────────────────────────────────────────────────
+  'form-group',
   'form-label',
   'col-form-label',
   'form-text',
@@ -73,6 +78,15 @@ export const CLASS_ORDER: readonly string[] = [
   'form-check',
   'form-check-',
   'form-switch',
+  'form-inline',
+  'custom-control',
+  'custom-control-',
+  'custom-checkbox',
+  'custom-radio',
+  'custom-select',
+  'custom-select-',
+  'custom-file',
+  'custom-file-',
   'form-floating',
   'form-range',
   'input-group',
@@ -99,8 +113,8 @@ export const CLASS_ORDER: readonly string[] = [
   'dropdown',
   'dropdown-',
   'dropup',
-  'dropend',
-  'dropstart',
+  'dropright',
+  'dropleft',
 
   // ── Button group ────────────────────────────────────────────
   'btn-group',
@@ -121,10 +135,6 @@ export const CLASS_ORDER: readonly string[] = [
   'card',
   'card-',
 
-  // ── Accordion ───────────────────────────────────────────────
-  'accordion',
-  'accordion-',
-
   // ── Breadcrumb ──────────────────────────────────────────────
   'breadcrumb',
   'breadcrumb-item',
@@ -144,9 +154,12 @@ export const CLASS_ORDER: readonly string[] = [
 
   // ── Progress ────────────────────────────────────────────────
   'progress',
-  'progress-',
   'progress-bar',
   'progress-bar-',
+
+  // ── Media object ────────────────────────────────────────────
+  'media',
+  'media-body',
 
   // ── List group ──────────────────────────────────────────────
   'list-group',
@@ -178,57 +191,47 @@ export const CLASS_ORDER: readonly string[] = [
   'spinner-grow',
   'spinner-grow-',
 
-  // ── Offcanvas ───────────────────────────────────────────────
-  'offcanvas',
-  'offcanvas-',
+  // ── Jumbotron ───────────────────────────────────────────────
+  'jumbotron',
+  'jumbotron-',
 
-  // ── Placeholders ────────────────────────────────────────────
-  'placeholder',
-  'placeholder-',
+  // ── Embed ───────────────────────────────────────────────────
+  'embed-responsive',
+  'embed-responsive-',
 
   // ── Helpers ─────────────────────────────────────────────────
   'clearfix',
-  'color-body',
   'link-',
-  'icon-link',
-  'icon-link-',
   'ratio',
   'ratio-',
   'fixed-top',
   'fixed-bottom',
   'sticky-top',
-  'sticky-bottom',
-  'sticky-',
-  'hstack',
-  'vstack',
   'stretched-link',
   'text-truncate',
-  'text-break',
-  'vr',
-  'visually-hidden',
-  'visually-hidden-focusable',
+  'sr-only',
+  'sr-only-focusable',
 
-  // ── Utilities (order follows scss/_utilities.scss $utilities map) ──
+  // ── Utilities ───────────────────────────────────────────────
   'align-',
+  'float-left',
+  'float-right',
   'float-',
-  'object-fit-',
-  'opacity-',
-  'overflow-x-',
-  'overflow-y-',
   'overflow-',
+  'opacity-',
   'd-',
   'shadow',
   'shadow-',
-  'focus-ring',
-  'focus-ring-',
   'position-',
   'top-',
   'bottom-',
-  'start-',
-  'end-',
+  'left-',
+  'right-',
   'translate-middle',
   'translate-middle-',
   'border',
+  'border-left',
+  'border-right',
   'border-',
   'w-',
   'mw-',
@@ -248,68 +251,63 @@ export const CLASS_ORDER: readonly string[] = [
   'mx-',
   'my-',
   'mt-',
-  'me-',
+  'mr-',
   'mb-',
-  'ms-',
+  'ml-',
   'p-',
   'px-',
   'py-',
   'pt-',
-  'pe-',
+  'pr-',
   'pb-',
-  'ps-',
-  'gap-',
-  'row-gap-',
-  'column-gap-',
+  'pl-',
+  'font-weight-',
+  'font-italic',
   'font-monospace',
   'fs-',
-  'fst-',
-  'fw-',
   'lh-',
+  'text-left',
+  'text-right',
   'text-decoration-',
   'text-',
-  'text-opacity-',
-  'link-opacity-',
-  'link-offset-',
-  'link-underline',
-  'link-underline-',
   'bg-',
-  'bg-opacity-',
   'bg-gradient',
   'user-select-',
+  'pointer-events-none',
   'pe-none',
   'pe-auto',
+  'rounded-left',
+  'rounded-right',
   'rounded',
   'rounded-',
   'visible',
   'invisible',
-  'z-',
 ]
 
-function buildOrderMap(): Map<string, number> {
+function buildOrderMapV4(): Map<string, number> {
   const map = new Map<string, number>()
-  for (const [index, prefix] of CLASS_ORDER.entries()) {
+  for (const [index, prefix] of CLASS_ORDER_V4.entries()) {
     map.set(prefix, index)
   }
   return map
 }
 
-export const ORDER_MAP: Map<string, number> = buildOrderMap()
+export const ORDER_MAP_V4: Map<string, number> = buildOrderMapV4()
 
-export function classKey(className: string): SortKey {
+export function classKeyV4(className: string): SortKey {
   let base = className
   let breakpointIdx = 0
 
-  const match = className.match(RESPONSIVE_RE)
+  const match = className.match(RESPONSIVE_RE_V4)
   if (match) {
     base = `${match[1]}-${match[3]}`
-    breakpointIdx = BREAKPOINTS.indexOf(match[2] as (typeof BREAKPOINTS)[number]) + 1
+    breakpointIdx = BREAKPOINTS_V4.indexOf(match[2] as (typeof BREAKPOINTS_V4)[number]) + 1
   }
 
   let bestIdx = -1
   let bestLen = 0
 
-  for (const [prefix, idx] of ORDER_MAP) {
+  for (const [prefix, idx] of ORDER_MAP_V4) {
     if (base === prefix || (prefix.endsWith('-') && base.startsWith(prefix))) {
       if (prefix.length > bestLen) {
         bestLen = prefix.length
@@ -322,10 +320,10 @@ export function classKey(className: string): SortKey {
   return [categoryIndex, breakpointIdx]
 }
 
-export function sortClasses(classes: string[]): string[] {
+export function sortClassesV4(classes: string[]): string[] {
   const annotated = classes.map((cls, i) => ({
     cls,
-    key: classKey(cls),
+    key: classKeyV4(cls),
     orig: i,
   }))
 

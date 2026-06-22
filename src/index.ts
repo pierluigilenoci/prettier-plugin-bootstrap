@@ -12,6 +12,7 @@ type AstProcessor = (
   attrMatcher: (name: string) => boolean,
   targetFunctions: string[],
   sortOptions: SortOptions,
+  sourceText: string,
 ) => any
 
 export const options = {
@@ -127,9 +128,10 @@ function createParserWrapper(
       const sortOptions: SortOptions = {
         preserveWhitespace: options.bootstrapPreserveWhitespace ?? false,
         preserveDuplicates: options.bootstrapPreserveDuplicates ?? true,
+        bootstrapVersion: options.bootstrapVersion ?? 5,
       }
 
-      return processAst(ast, attrMatcher, targetFunctions, sortOptions)
+      return processAst(ast, attrMatcher, targetFunctions, sortOptions, text)
     },
   }
 
