@@ -703,4 +703,51 @@ describe('inline ignore — coverage branches', () => {
     processHtmlAst(ast, ['class'], [], {}, sourceText)
     expect(ast.attrs[0].value).toBe('mt-3 container')
   })
+
+  it('skips node.attributes path when prettier-bootstrap-ignore-next is set (line 137)', () => {
+    const sourceText = '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      attributes: [{ name: 'class', value: 'mt-3 container' }],
+      range: [nodeStart, sourceText.length],
+    }
+    processHtmlAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.attributes[0].value).toBe('mt-3 container')
+  })
+
+  it('skips CallExpression path when prettier-bootstrap-ignore-next is set (line 190)', () => {
+    const sourceText = '// prettier-bootstrap-ignore-next\nclsx("mt-3 container")'
+    const nodeStart = sourceText.indexOf('clsx')
+    const ast = {
+      type: 'CallExpression',
+      callee: { type: 'Identifier', name: 'clsx' },
+      arguments: [{ type: 'StringLiteral', value: 'mt-3 container' }],
+      range: [nodeStart, sourceText.length],
+    }
+    processJsxAst(ast, ['className'], ['clsx'], {}, sourceText)
+    expect(ast.arguments[0].value).toBe('mt-3 container')
+  })
+
+  it('skips Svelte attribute when prettier-bootstrap-ignore-next is set (line 236)', () => {
+    const sourceText = '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      fragment: {
+        nodes: [
+          {
+            attributes: [
+              {
+                type: 'Attribute',
+                name: 'class',
+                value: [{ type: 'Text', data: 'mt-3 container', raw: 'mt-3 container' }],
+              },
+            ],
+            range: [nodeStart, sourceText.length],
+          },
+        ],
+      },
+    }
+    processSvelteAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.fragment.nodes[0].attributes[0].value[0].data).toBe('mt-3 container')
+  })
 })
