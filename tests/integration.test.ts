@@ -85,8 +85,7 @@ describe('inline ignore comments', () => {
   })
 
   it('skips sorting with prettier-bootstrap-ignore-next on previous line (HTML)', () => {
-    const sourceText =
-      '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
+    const sourceText = '<!-- prettier-bootstrap-ignore-next -->\n<div class="mt-3 container"></div>'
     const nodeStart = sourceText.indexOf('<div')
     const ast = {
       attrs: [{ name: 'class', value: 'mt-3 container' }],
@@ -97,8 +96,7 @@ describe('inline ignore comments', () => {
   })
 
   it('skips sorting with prettier-bootstrap-ignore-line on same line (HTML)', () => {
-    const sourceText =
-      '<div class="mt-3 container"> <!-- prettier-bootstrap-ignore-line --></div>'
+    const sourceText = '<div class="mt-3 container"> <!-- prettier-bootstrap-ignore-line --></div>'
     const nodeStart = 0
     const ast = {
       attrs: [{ name: 'class', value: 'mt-3 container' }],
@@ -109,8 +107,7 @@ describe('inline ignore comments', () => {
   })
 
   it('skips JSXAttribute sorting with prettier-bootstrap-ignore-next', () => {
-    const sourceText =
-      '// prettier-bootstrap-ignore-next\n<div className="mt-3 container" />'
+    const sourceText = '// prettier-bootstrap-ignore-next\n<div className="mt-3 container" />'
     const nodeStart = sourceText.indexOf('<div')
     const jsxAttrNode = {
       type: 'JSXAttribute',
@@ -118,7 +115,11 @@ describe('inline ignore comments', () => {
       value: { type: 'StringLiteral', value: 'mt-3 container' },
       range: [nodeStart, sourceText.length],
     }
-    const ast = { type: 'JSXElement', attributes: [jsxAttrNode], range: [nodeStart, sourceText.length] }
+    const ast = {
+      type: 'JSXElement',
+      attributes: [jsxAttrNode],
+      range: [nodeStart, sourceText.length],
+    }
     processJsxAst(ast, matchClass, [], {}, sourceText)
     expect(jsxAttrNode.value.value).toBe('mt-3 container')
   })
