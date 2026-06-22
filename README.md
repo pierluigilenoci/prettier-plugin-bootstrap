@@ -11,6 +11,8 @@
 [![codecov](https://codecov.io/gh/pierluigilenoci/prettier-plugin-bootstrap/branch/main/graph/badge.svg)](https://codecov.io/gh/pierluigilenoci/prettier-plugin-bootstrap)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+**[Try it in the playground →](https://pierluigilenoci.github.io/prettier-plugin-bootstrap/)**
+
 A [Prettier](https://prettier.io/) plugin that automatically sorts Bootstrap CSS classes following the framework's recommended order.
 
 Works with **HTML**, **JSX/TSX**, **Vue**, **Angular**, **Svelte**, and **Astro** templates.

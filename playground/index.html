@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>prettier-plugin-bootstrap — Playground</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bs-purple: #7952b3;
+        --bs-purple-dark: #563d7c;
+        --border: #dee2e6;
+        --bg: #f8f9fa;
+        --text: #212529;
+        --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        background: linear-gradient(90deg, var(--bs-purple), var(--bs-purple-dark));
+        color: white;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-shrink: 0;
+      }
+
+      header h1 {
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+
+      header a {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.85rem;
+        text-decoration: none;
+        margin-left: auto;
+      }
+
+      header a:hover {
+        color: white;
+      }
+
+      .options-bar {
+        background: white;
+        border-bottom: 1px solid var(--border);
+        padding: 0.6rem 1.5rem;
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        font-size: 0.875rem;
+      }
+
+      .options-bar label {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .options-bar select {
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.875rem;
+      }
+
+      .status {
+        margin-left: auto;
+        font-size: 0.8rem;
+        color: #6c757d;
+      }
+
+      .status.error {
+        color: #dc3545;
+      }
+
+      .panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .panel {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-right: 1px solid var(--border);
+      }
+
+      .panel:last-child {
+        border-right: none;
+      }
+
+      .panel-header {
+        background: white;
+        border-bottom: 1px solid var(--border);
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+      }
+
+      .copy-btn {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.15rem 0.5rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        color: #6c757d;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg);
+      }
+      .copy-btn.copied {
+        color: #198754;
+        border-color: #198754;
+      }
+
+      textarea,
+      .output {
+        flex: 1;
+        padding: 1rem;
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        line-height: 1.6;
+        resize: none;
+        border: none;
+        outline: none;
+        background: white;
+        overflow: auto;
+      }
+
+      textarea {
+        border-right: 1px solid var(--border);
+      }
+      .output {
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 2rem 3rem;
+        text-align: center;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+      }
+
+      .spinner {
+        width: 2rem;
+        height: 2rem;
+        border: 3px solid var(--border);
+        border-top-color: var(--bs-purple);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        margin: 0 auto 0.75rem;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .panels {
+          grid-template-columns: 1fr;
+          grid-template-rows: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 28 28"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect width="28" height="28" rx="6" fill="white" fill-opacity="0.15" />
+        <text
+          x="5"
+          y="22"
+          font-family="Georgia,serif"
+          font-size="20"
+          font-weight="700"
+          fill="white"
+        >
+          B
+        </text>
+      </svg>
+      <h1>prettier-plugin-bootstrap</h1>
+      <a
+        href="https://github.com/pierluigilenoci/prettier-plugin-bootstrap"
+        target="_blank"
+        rel="noopener"
+      >
+        GitHub ↗
+      </a>
+    </header>
+
+    <div class="options-bar">
+      <label>
+        Parser:
+        <select id="parser">
+          <option value="html">HTML</option>
+          <option value="babel">JSX / Babel</option>
+          <option value="typescript">TSX / TypeScript</option>
+          <option value="vue">Vue</option>
+          <option value="angular">Angular</option>
+        </select>
+      </label>
+      <label>
+        <input type="checkbox" id="preserveDuplicates" checked />
+        Preserve duplicates
+      </label>
+      <label>
+        <input type="checkbox" id="preserveWhitespace" />
+        Preserve whitespace
+      </label>
+      <span class="status" id="status">Loading Prettier…</span>
+    </div>
+
+    <div class="panels">
+      <div class="panel">
+        <div class="panel-header">Input</div>
+        <textarea id="input" spellcheck="false" placeholder="Paste Bootstrap HTML here…"></textarea>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          Output
+          <button class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+        <div class="output" id="output"></div>
+      </div>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      Loading Prettier…
+    </div>
+
+    <script type="module">
+      import prettier from 'https://unpkg.com/prettier@3/standalone.mjs'
+      import prettierHtml from 'https://unpkg.com/prettier@3/plugins/html.mjs'
+      import prettierBabel from 'https://unpkg.com/prettier@3/plugins/babel.mjs'
+      import prettierEstree from 'https://unpkg.com/prettier@3/plugins/estree.mjs'
+      import prettierTypescript from 'https://unpkg.com/prettier@3/plugins/typescript.mjs'
+      import bootstrapPlugin from './dist/index.mjs'
+
+      const DEFAULT_SAMPLES = {
+        html: `<div class="text-center p-3 container bg-primary text-white mb-4 rounded">
+  <button class="btn-lg mt-2 btn btn-light d-flex align-items-center">
+    Click me
+  </button>
+  <nav class="navbar-expand-lg navbar bg-body-tertiary fixed-top navbar">
+  </nav>
+</div>`,
+        babel: `export default function App() {
+  return (
+    <div className="text-center p-3 container bg-primary text-white mb-4 rounded">
+      <button className="btn-lg mt-2 btn btn-light d-flex align-items-center">
+        Click me
+      </button>
+    </div>
+  )
+}`,
+        typescript: `const Card: React.FC = () => (
+  <div className="shadow-sm card mb-3 border-0 p-4 rounded-3">
+    <h2 className="fw-bold fs-4 card-title mb-2">Title</h2>
+  </div>
+)`,
+        vue: `<template>
+  <div class="text-center p-3 container bg-primary">
+    <button class="btn-lg mt-2 btn btn-light">Click</button>
+  </div>
+</template>`,
+        angular: `<div class="text-center p-3 container bg-primary">
+  <button class="btn-lg mt-2 btn btn-light">Click</button>
+</div>`,
+      }
+
+      const parserToPlugins = {
+        html: [prettierHtml, bootstrapPlugin],
+        babel: [prettierBabel, prettierEstree, bootstrapPlugin],
+        typescript: [prettierTypescript, prettierEstree, bootstrapPlugin],
+        vue: [prettierHtml, bootstrapPlugin],
+        angular: [prettierHtml, bootstrapPlugin],
+      }
+
+      const inputEl = document.getElementById('input')
+      const outputEl = document.getElementById('output')
+      const statusEl = document.getElementById('status')
+      const parserEl = document.getElementById('parser')
+      const preserveDuplicatesEl = document.getElementById('preserveDuplicates')
+      const preserveWhitespaceEl = document.getElementById('preserveWhitespace')
+      const copyBtn = document.getElementById('copyBtn')
+      const loadingEl = document.getElementById('loading')
+
+      let timer = null
+
+      async function format() {
+        const parser = parserEl.value
+        const text = inputEl.value
+        if (!text.trim()) {
+          outputEl.textContent = ''
+          return
+        }
+
+        try {
+          const result = await prettier.format(text, {
+            parser,
+            plugins: parserToPlugins[parser],
+            bootstrapPreserveDuplicates: preserveDuplicatesEl.checked,
+            bootstrapPreserveWhitespace: preserveWhitespaceEl.checked,
+          })
+          outputEl.textContent = result
+          statusEl.textContent = 'Formatted'
+          statusEl.className = 'status'
+        } catch (e) {
+          outputEl.textContent = ''
+          statusEl.textContent = String(e.message ?? e).slice(0, 120)
+          statusEl.className = 'status error'
+        }
+      }
+
+      function schedule() {
+        clearTimeout(timer)
+        timer = setTimeout(format, 150)
+      }
+
+      parserEl.addEventListener('change', () => {
+        inputEl.value = DEFAULT_SAMPLES[parserEl.value] ?? ''
+        schedule()
+      })
+
+      inputEl.addEventListener('input', schedule)
+      preserveDuplicatesEl.addEventListener('change', schedule)
+      preserveWhitespaceEl.addEventListener('change', schedule)
+
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(outputEl.textContent ?? '').then(() => {
+          copyBtn.textContent = 'Copied!'
+          copyBtn.className = 'copy-btn copied'
+          setTimeout(() => {
+            copyBtn.textContent = 'Copy'
+            copyBtn.className = 'copy-btn'
+          }, 1500)
+        })
+      })
+
+      // Init
+      inputEl.value = DEFAULT_SAMPLES.html
+      loadingEl.style.display = 'none'
+      statusEl.textContent = 'Ready'
+      format()
+    </script>
+  </body>
+</html>
