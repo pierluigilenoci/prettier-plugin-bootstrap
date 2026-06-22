@@ -781,4 +781,27 @@ describe('inline ignore — coverage branches', () => {
     processSvelteAst(ast, ['class'], [], {}, sourceText)
     expect(ast.fragment.nodes[0].attributes[0].value[0].data).toBe('mt-3 container')
   })
+
+  it('respects ignore-next comment even with blank lines between comment and element', () => {
+    const sourceText =
+      '<!-- prettier-bootstrap-ignore-next -->\n\n\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      range: [nodeStart, sourceText.length],
+    }
+    processHtmlAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.attrs[0].value).toBe('mt-3 container')
+  })
+
+  it('does NOT treat a non-ignore comment as an ignore (blank-line skip stops at first non-blank)', () => {
+    const sourceText = '<!-- some other comment -->\n\n<div class="mt-3 container"></div>'
+    const nodeStart = sourceText.indexOf('<div')
+    const ast = {
+      attrs: [{ name: 'class', value: 'mt-3 container' }],
+      range: [nodeStart, sourceText.length],
+    }
+    processHtmlAst(ast, ['class'], [], {}, sourceText)
+    expect(ast.attrs[0].value).toBe('container mt-3')
+  })
 })

@@ -135,3 +135,35 @@ jobs:
           check dist/index.cjs 51200
           check dist/sorter.mjs 10240
           check dist/sorter.cjs 10240
+
+  eslint-plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install root dependencies
+        run: pnpm install
+
+      - name: Build main plugin (required by eslint-plugin peer dep)
+        run: pnpm run build
+
+      - name: Install eslint-plugin dependencies
+        working-directory: packages/eslint-plugin
+        run: pnpm install
+
+      - name: Type check eslint-plugin
+        working-directory: packages/eslint-plugin
+        run: pnpm run typecheck
+
+      - name: Test eslint-plugin
+        working-directory: packages/eslint-plugin
+        run: pnpm run test

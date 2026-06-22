@@ -1,6 +1,14 @@
 import type { Rule } from 'eslint'
 import { sortClassString } from 'prettier-plugin-bootstrap/sorter'
 
+type LiteralValue = { type: 'Literal'; value: unknown; raw?: string }
+type JSXValue = LiteralValue | { type: string }
+
+type JSXAttributeShape = {
+  name: { name?: string; namespace?: unknown } | { name: unknown }
+  value: JSXValue | null
+}
+
 const sortClasses: Rule.RuleModule = {
   meta: {
     type: 'suggestion',
@@ -16,23 +24,30 @@ const sortClasses: Rule.RuleModule = {
   },
   create(context) {
     return {
-      JSXAttribute(node) {
-        if (!node.name || !node.value) return
+      JSXAttribute(node: Rule.Node) {
+        const jsxAttr = node as Rule.Node & JSXAttributeShape
+        if (!jsxAttr.value) return
         const attrName =
-          typeof node.name.name === 'string' ? node.name.name : (node.name.name?.name ?? '')
+          'name' in jsxAttr.name && typeof jsxAttr.name.name === 'string'
+            ? jsxAttr.name.name
+            : ''
         if (attrName !== 'className' && attrName !== 'class') return
 
-        if (node.value.type === 'Literal' && typeof node.value.value === 'string') {
-          const raw = context.getSourceCode().getText(node.value)
-          const quote = raw[0]
-          const value = node.value.value
+        const val = jsxAttr.value
+        if (val.type === 'Literal' && typeof (val as LiteralValue).value === 'string') {
+          const litVal = val as LiteralValue
+          const valueNode = { ...litVal } as unknown as Rule.Node
+          const rawValue = context.sourceCode.getText(node).match(/=(.+)$/)?.[1] ?? `"${litVal.value}"`
+          const quote = rawValue[0] ?? '"'
+          const value = litVal.value as string
           const sorted = sortClassString(value)
           if (sorted !== value) {
             context.report({
-              node: node.value,
+              node,
               messageId: 'unsorted',
               data: { expected: sorted },
-              fix: (fixer) => fixer.replaceText(node.value!, `${quote}${sorted}${quote}`),
+              fix: (fixer) =>
+                fixer.replaceText(valueNode, `${quote}${sorted}${quote}`),
             })
           }
         }

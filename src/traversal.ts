@@ -9,8 +9,13 @@ function isIgnored(sourceText: string, nodeStart: number): boolean {
   if (nodeStart < 0 || !sourceText) return false
   const lookback = sourceText.slice(Math.max(0, nodeStart - 500), nodeStart)
   const lines = lookback.split('\n')
-  const prevLine = lines.at(-2) ?? ''
-  return /prettier-bootstrap-ignore-next/.test(prevLine)
+  // Walk backwards from the node, skipping blank lines, to find the nearest non-blank line.
+  for (let i = lines.length - 2; i >= 0; i--) {
+    const line = lines[i]!.trim()
+    if (line === '') continue
+    return /prettier-bootstrap-ignore-next/.test(line)
+  }
+  return false
 }
 
 const AST_KEYS = [
