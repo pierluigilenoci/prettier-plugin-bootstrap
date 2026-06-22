@@ -663,6 +663,16 @@ describe('branch coverage — remaining edges', () => {
     processJsxAst(ast, ['className'])
     expect(ast.value.value).toBe('container mt-3')
   })
+
+  it('sortStringNode skips unknown node types (false branch of TemplateLiteral check)', () => {
+    const ast = {
+      type: 'CallExpression',
+      callee: { type: 'Identifier', name: 'clsx' },
+      arguments: [{ type: 'Identifier', name: 'myClasses' }],
+    }
+    processJsxAst(ast, ['className'], ['clsx'])
+    expect(ast.arguments[0].name).toBe('myClasses')
+  })
 })
 
 describe('inline ignore — coverage branches', () => {

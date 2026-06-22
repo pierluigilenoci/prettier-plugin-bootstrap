@@ -63,4 +63,9 @@ describe('Bootstrap 4 class order', () => {
     const parts = result.split(' ')
     expect(parts.indexOf('container')).toBeLessThan(parts.indexOf('ms-3'))
   })
+
+  it('sorts responsive Bootstrap 4 classes (breakpoint branch)', () => {
+    const sorted = sortClassesV4(['d-md-flex', 'd-flex', 'd-lg-none'])
+    expect(sorted).toEqual(['d-flex', 'd-md-flex', 'd-lg-none'])
+  })
 })
