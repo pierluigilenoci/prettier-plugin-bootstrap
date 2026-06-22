@@ -83,3 +83,51 @@ jobs:
 
       - name: Publish dry-run
         run: pnpm publish --dry-run --no-git-checks
+
+  bundle-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Report bundle sizes
+        run: |
+          echo "## Bundle sizes" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "| ---- | ---- |" >> $GITHUB_STEP_SUMMARY
+          for f in dist/index.mjs dist/index.cjs dist/sorter.mjs dist/sorter.cjs; do
+            size=$(du -sh "$f" | cut -f1)
+            echo "| \`$f\` | $size |" >> $GITHUB_STEP_SUMMARY
+          done
+
+      - name: Enforce size limits
+        run: |
+          # index bundles must stay under 50 KB, sorter under 10 KB
+          check() {
+            local file=$1 limit=$2
+            local bytes
+            bytes=$(wc -c < "$file")
+            if [ "$bytes" -gt "$limit" ]; then
+              echo "ERROR: $file is ${bytes}B, exceeds limit of ${limit}B" >&2
+              exit 1
+            fi
+          }
+          check dist/index.mjs 51200
+          check dist/index.cjs 51200
+          check dist/sorter.mjs 10240
+          check dist/sorter.cjs 10240
