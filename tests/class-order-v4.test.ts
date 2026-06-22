@@ -73,4 +73,11 @@ describe('Bootstrap 4 class order', () => {
     const sorted = sortClassesV4(['acme-b', 'acme-a'])
     expect(sorted).toEqual(['acme-b', 'acme-a'])
   })
+
+  it('resolves longest matching prefix over shorter one (false branch of prefix.length > bestLen)', () => {
+    const [floatLeftIdx] = classKeyV4('float-left')
+    const [floatIdx] = classKeyV4('float-start')
+    expect(floatLeftIdx).not.toBe(Infinity)
+    expect(floatLeftIdx).not.toBe(floatIdx)
+  })
 })
