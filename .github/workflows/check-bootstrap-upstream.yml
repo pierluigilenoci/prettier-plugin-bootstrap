@@ -1,0 +1,73 @@
+name: Check Bootstrap upstream
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-bootstrap-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Check Bootstrap version and open issue if outdated
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+
+            const { version: pinned } = JSON.parse(fs.readFileSync('bootstrap-version.json', 'utf8'))
+
+            const res = await fetch('https://registry.npmjs.org/bootstrap/latest')
+            const { version: latest } = await res.json()
+
+            core.info(`Pinned: ${pinned} — Latest: ${latest}`)
+
+            if (latest === pinned) {
+              core.info('bootstrap-version.json is up to date.')
+              return
+            }
+
+            const title = `chore: update CLASS_ORDER for Bootstrap ${latest}`
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'bootstrap-sync',
+            })
+
+            if (issues.some(i => i.title === title)) {
+              core.info('Issue already open, skipping.')
+              return
+            }
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              labels: ['bootstrap-sync', 'enhancement'],
+              body: [
+                `Bootstrap **${latest}** has been released. \`bootstrap-version.json\` currently references **${pinned}**.`,
+                '',
+                '## Steps',
+                '',
+                `1. Review the [Bootstrap changelog](https://github.com/twbs/bootstrap/releases/tag/v${latest}) for new, renamed, or removed utility classes.`,
+                '2. Update `src/class-order.ts` to reflect any changes.',
+                `3. Bump \`version\` in \`bootstrap-version.json\` to \`${latest}\`.`,
+                '4. Run `pnpm run test` to verify coverage.',
+                '',
+                `_Opened automatically by the [Check Bootstrap upstream](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/check-bootstrap-upstream.yml) workflow._`,
+              ].join('\n'),
+            })
+
+            core.info(`Issue created: ${title}`)
