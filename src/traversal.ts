@@ -168,7 +168,7 @@ export function processJsxAst(
     if (node.type === 'JSXAttribute' || node.type === 'JSXSpreadAttribute') {
       const name = node.name && (node.name.name || node.name.value)
       if (matchAttr(name) && node.value) {
-        /* v8 ignore next */
+        /* c8 ignore next */
         if (isIgnored(sourceText ?? '', getNodeStart(node))) return
         if (node.value.type === 'StringLiteral' || node.value.type === 'Literal') {
           const sorted = sortClassString(node.value.value, sortOptions)
