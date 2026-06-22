@@ -48,7 +48,8 @@ export const options = {
     type: 'int' as const,
     default: 5,
     category: 'Bootstrap',
-    description: 'Bootstrap version (for future version-specific sorting rules).',
+    description:
+      'Bootstrap version to use for class sorting. Supported values: 4, 5. Any other value falls back to Bootstrap 5 sorting.',
   },
   bootstrapSortTemplateLiterals: {
     type: 'boolean' as const,

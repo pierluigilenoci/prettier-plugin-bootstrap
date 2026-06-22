@@ -1,8 +1,6 @@
-import type { SortKey } from './types'
+import { buildClassSorter } from './sorting-core'
 
 export const BREAKPOINTS_V4 = ['sm', 'md', 'lg', 'xl'] as const
-
-const RESPONSIVE_RE_V4 = new RegExp(`^(.+?)-(${BREAKPOINTS_V4.join('|')})-(.+)$`)
 
 // Bootstrap 4 class order — mirrors the structure of class-order.ts for Bootstrap 5.
 // Key differences from Bootstrap 5:
@@ -284,54 +282,10 @@ export const CLASS_ORDER_V4: readonly string[] = [
   'invisible',
 ]
 
-function buildOrderMapV4(): Map<string, number> {
-  const map = new Map<string, number>()
-  for (const [index, prefix] of CLASS_ORDER_V4.entries()) {
-    map.set(prefix, index)
-  }
-  return map
-}
+const {
+  classKey: classKeyV4,
+  sortClasses: sortClassesV4,
+  orderMap: ORDER_MAP_V4,
+} = buildClassSorter(CLASS_ORDER_V4, BREAKPOINTS_V4)
 
-export const ORDER_MAP_V4: Map<string, number> = buildOrderMapV4()
-
-export function classKeyV4(className: string): SortKey {
-  let base = className
-  let breakpointIdx = 0
-
-  const match = className.match(RESPONSIVE_RE_V4)
-  if (match) {
-    base = `${match[1]}-${match[3]}`
-    breakpointIdx = BREAKPOINTS_V4.indexOf(match[2] as (typeof BREAKPOINTS_V4)[number]) + 1
-  }
-
-  let bestIdx = -1
-  let bestLen = 0
-
-  for (const [prefix, idx] of ORDER_MAP_V4) {
-    if (base === prefix || (prefix.endsWith('-') && base.startsWith(prefix))) {
-      if (prefix.length > bestLen) {
-        bestLen = prefix.length
-        bestIdx = idx
-      }
-    }
-  }
-
-  const categoryIndex = bestIdx === -1 ? Infinity : bestIdx
-  return [categoryIndex, breakpointIdx]
-}
-
-export function sortClassesV4(classes: string[]): string[] {
-  const annotated = classes.map((cls, i) => ({
-    cls,
-    key: classKeyV4(cls),
-    orig: i,
-  }))
-
-  annotated.sort((a, b) => {
-    if (a.key[0] !== b.key[0]) return a.key[0] - b.key[0]
-    if (a.key[1] !== b.key[1]) return a.key[1] - b.key[1]
-    return a.orig - b.orig
-  })
-
-  return annotated.map((entry) => entry.cls)
-}
+export { classKeyV4, sortClassesV4, ORDER_MAP_V4 }

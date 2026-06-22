@@ -1,8 +1,6 @@
-import type { SortKey } from './types'
+import { buildClassSorter } from './sorting-core'
 
 export const BREAKPOINTS = ['sm', 'md', 'lg', 'xl', 'xxl'] as const
-
-const RESPONSIVE_RE = new RegExp(`^(.+?)-(${BREAKPOINTS.join('|')})-(.+)$`)
 
 export const CLASS_ORDER: readonly string[] = [
   // ── Layout ──────────────────────────────────────────────────
@@ -286,54 +284,6 @@ export const CLASS_ORDER: readonly string[] = [
   'z-',
 ]
 
-function buildOrderMap(): Map<string, number> {
-  const map = new Map<string, number>()
-  for (const [index, prefix] of CLASS_ORDER.entries()) {
-    map.set(prefix, index)
-  }
-  return map
-}
+const { classKey, sortClasses, orderMap: ORDER_MAP } = buildClassSorter(CLASS_ORDER, BREAKPOINTS)
 
-export const ORDER_MAP: Map<string, number> = buildOrderMap()
-
-export function classKey(className: string): SortKey {
-  let base = className
-  let breakpointIdx = 0
-
-  const match = className.match(RESPONSIVE_RE)
-  if (match) {
-    base = `${match[1]}-${match[3]}`
-    breakpointIdx = BREAKPOINTS.indexOf(match[2] as (typeof BREAKPOINTS)[number]) + 1
-  }
-
-  let bestIdx = -1
-  let bestLen = 0
-
-  for (const [prefix, idx] of ORDER_MAP) {
-    if (base === prefix || (prefix.endsWith('-') && base.startsWith(prefix))) {
-      if (prefix.length > bestLen) {
-        bestLen = prefix.length
-        bestIdx = idx
-      }
-    }
-  }
-
-  const categoryIndex = bestIdx === -1 ? Infinity : bestIdx
-  return [categoryIndex, breakpointIdx]
-}
-
-export function sortClasses(classes: string[]): string[] {
-  const annotated = classes.map((cls, i) => ({
-    cls,
-    key: classKey(cls),
-    orig: i,
-  }))
-
-  annotated.sort((a, b) => {
-    if (a.key[0] !== b.key[0]) return a.key[0] - b.key[0]
-    if (a.key[1] !== b.key[1]) return a.key[1] - b.key[1]
-    return a.orig - b.orig
-  })
-
-  return annotated.map((entry) => entry.cls)
-}
+export { classKey, sortClasses, ORDER_MAP }

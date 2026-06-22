@@ -311,6 +311,21 @@ describe('e2e — prettier.format() with plugin', () => {
       const result = await format(input, 'html', { bootstrapVersion: 5 })
       expect(result).toContain('class="container mt-3"')
     })
+
+    it('uses Bootstrap 5 sorting when bootstrapVersion is 5', async () => {
+      const input = '<div class="mt-3 container d-flex"></div>\n'
+      const result = await format(input, 'html', { bootstrapVersion: 5 })
+      expect(result).toContain('class="container d-flex mt-3"')
+    })
+
+    it('falls back to Bootstrap 5 sorting for unsupported bootstrapVersion values', async () => {
+      const input = '<div class="mt-3 container"></div>\n'
+      const result99 = await format(input, 'html', { bootstrapVersion: 99 })
+      const result3 = await format(input, 'html', { bootstrapVersion: 3 })
+      const resultv5 = await format(input, 'html', { bootstrapVersion: 5 })
+      expect(result99).toBe(resultv5)
+      expect(result3).toBe(resultv5)
+    })
   })
 
   describe('bootstrapPreserveWhitespace option', () => {

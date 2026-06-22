@@ -26,14 +26,22 @@ pnpm run test
 
 ```
 src/
-  class-order.ts   # Bootstrap class sort order (the main list)
-  index.ts         # Prettier plugin entry point
-  sorting.ts       # Core sorting logic
-  traversal.ts     # AST traversal for all supported parsers
+  class-order.ts    # Bootstrap 5 class sort order and sorting logic
+  class-order-v4.ts # Bootstrap 4 class sort order and sorting logic
+  index.ts          # Prettier plugin entry point (options, parser wrappers)
+  sorter.ts         # Public programmatic API (createSorter factory)
+  sorting.ts        # Core sortClassString() implementation
+  traversal.ts      # AST traversal for all supported parsers
+  types.ts          # Shared TypeScript type definitions
 tests/
-  class-order.test.ts
-  coverage.test.ts
-  integration.test.ts
+  class-order.test.ts     # Unit tests for Bootstrap 5 sort order
+  class-order-v4.test.ts  # Unit tests for Bootstrap 4 sort order
+  coverage.test.ts        # Edge-case / branch-coverage tests
+  e2e.test.ts             # End-to-end prettier.format() tests
+  fixtures.test.ts        # Fixture-file formatting tests
+  integration.test.ts     # Integration tests for realistic class lists
+  snapshot.test.ts        # Inline snapshot tests for output stability
+  sorter.test.ts          # Tests for the public sorter API
 ```
 
 ## Good first issues

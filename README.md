@@ -122,7 +122,7 @@ Unknown classes are preserved in their original relative order and placed after 
 | `bootstrapFunctions`            | `string[]` | `[]`    | Function names whose arguments are class lists (e.g. `clsx`, `classNames`)                                           |
 | `bootstrapPreserveWhitespace`   | `boolean`  | `false` | Preserve original whitespace between classes instead of normalizing to single spaces                                 |
 | `bootstrapPreserveDuplicates`   | `boolean`  | `true`  | Keep duplicate class names. Set to `false` to remove duplicates                                                      |
-| `bootstrapVersion`              | `int`      | `5`     | Bootstrap version (`4` or `5`)                                                                                       |
+| `bootstrapVersion`              | `int`      | `5`     | Bootstrap version (`4` or `5`). Any other value falls back to Bootstrap 5 sorting.                                   |
 | `bootstrapSortTemplateLiterals` | `boolean`  | `true`  | Sort static class segments inside JSX template literals that contain expressions. Set to `false` to skip them        |
 
 ### `bootstrapAttributes`
@@ -381,7 +381,16 @@ pnpm run typecheck
 
 - Prettier >= 3.0.0
 - Node.js >= 20.19
-- Bootstrap 5 (class order)
+- Bootstrap 5 (default, `bootstrapVersion: 5`)
+- Bootstrap 4 (`bootstrapVersion: 4`)
+
+## ESLint companion
+
+An ESLint plugin is available under [`packages/eslint-plugin`](packages/eslint-plugin/README.md) for enforcing sorted Bootstrap class order as a lint rule (useful in pre-commit hooks or CI without running Prettier).
+
+```bash
+npm install -D eslint-plugin-bootstrap-order
+```
 
 ## License
 

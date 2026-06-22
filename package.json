@@ -22,6 +22,7 @@
   "files": [
     "dist"
   ],
+  "sideEffects": false,
   "engines": {
     "node": ">=20.19"
   },
@@ -56,7 +57,17 @@
   },
   "homepage": "https://github.com/pierluigilenoci/prettier-plugin-bootstrap#readme",
   "peerDependencies": {
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "prettier-plugin-astro": ">=0.14.0",
+    "prettier-plugin-svelte": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "prettier-plugin-astro": {
+      "optional": true
+    },
+    "prettier-plugin-svelte": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -64,6 +75,8 @@
     "@vitest/coverage-v8": "^4.1.9",
     "eslint": "^10.5.0",
     "prettier": "^3.8.4",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-svelte": "^4.1.1",
     "tsdown": "^0.22.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.61.1",
