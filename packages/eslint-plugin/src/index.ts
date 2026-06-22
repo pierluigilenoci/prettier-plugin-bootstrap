@@ -16,23 +16,24 @@ const sortClasses: Rule.RuleModule = {
   },
   create(context) {
     return {
-      JSXAttribute(node) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      JSXAttribute(node: any) {
         if (!node.name || !node.value) return
         const attrName =
           typeof node.name.name === 'string' ? node.name.name : (node.name.name?.name ?? '')
         if (attrName !== 'className' && attrName !== 'class') return
 
         if (node.value.type === 'Literal' && typeof node.value.value === 'string') {
-          const raw = context.getSourceCode().getText(node.value)
+          const raw = context.sourceCode.getText(node.value)
           const quote = raw[0]
-          const value = node.value.value
+          const value = node.value.value as string
           const sorted = sortClassString(value)
           if (sorted !== value) {
             context.report({
               node: node.value,
               messageId: 'unsorted',
               data: { expected: sorted },
-              fix: (fixer) => fixer.replaceText(node.value!, `${quote}${sorted}${quote}`),
+              fix: (fixer: Rule.RuleFixer) => fixer.replaceText(node.value, `${quote}${sorted}${quote}`),
             })
           }
         }

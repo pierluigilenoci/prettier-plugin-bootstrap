@@ -156,6 +156,10 @@ jobs:
       - name: Build main plugin (required by eslint-plugin peer dep)
         run: pnpm run build
 
+      - name: Install eslint-plugin dependencies
+        working-directory: packages/eslint-plugin
+        run: pnpm install
+
       - name: Type check eslint-plugin
         working-directory: packages/eslint-plugin
         run: pnpm run typecheck

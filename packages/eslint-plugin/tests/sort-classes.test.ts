@@ -4,45 +4,40 @@ import plugin from '../src/index'
 
 const rule = plugin.rules['sort-classes']!
 
-// RuleTester requires a synchronous test runner; we adapt it for vitest.
 const errors: string[] = []
 const passes: string[] = []
 
 const tester = new RuleTester({
   languageOptions: {
     ecmaVersion: 2020,
-    parserOptions: { ecmaFeatures: { jsx: true } },
+    parserOptions: {
+      ecmaFeatures: { jsx: true },
+    },
   },
 })
 
 try {
   tester.run('bootstrap-order/sort-classes', rule, {
     valid: [
-      // Already sorted — should pass
-      { code: '<div className="container mt-3 p-2" />', language: 'jsx' },
-      { code: '<div className="btn btn-primary" />', language: 'jsx' },
-      { code: '<div className="d-flex align-items-center mt-3" />', language: 'jsx' },
-      // No class attribute — should pass
-      { code: '<div id="main" />', language: 'jsx' },
-      // Empty class — should pass
-      { code: '<div className="" />', language: 'jsx' },
+      { code: '<div className="container mt-3 p-2" />' },
+      { code: '<div className="btn btn-primary" />' },
+      { code: '<div className="d-flex align-items-center mt-3" />' },
+      { code: '<div id="main" />' },
+      { code: '<div className="" />' },
     ],
     invalid: [
       {
         code: '<div className="mt-3 container" />',
-        language: 'jsx',
         errors: [{ messageId: 'unsorted' }],
         output: '<div className="container mt-3" />',
       },
       {
         code: '<div className="p-3 btn btn-primary mt-2" />',
-        language: 'jsx',
         errors: [{ messageId: 'unsorted' }],
         output: '<div className="btn btn-primary mt-2 p-3" />',
       },
       {
         code: '<div class="text-center p-3 container" />',
-        language: 'jsx',
         errors: [{ messageId: 'unsorted' }],
         output: '<div class="container p-3 text-center" />',
       },
