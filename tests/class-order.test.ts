@@ -136,3 +136,12 @@ describe('CLASS_ORDER', () => {
     expect(CLASS_ORDER[0]).toMatch(/^container/)
   })
 })
+
+describe('sorter public API exports', () => {
+  it('exports CLASS_ORDER, BREAKPOINTS, and classKey from sorter entry point', async () => {
+    const sorterModule = await import('../src/sorter')
+    expect(sorterModule.CLASS_ORDER).toBe(CLASS_ORDER)
+    expect(sorterModule.BREAKPOINTS).toBeDefined()
+    expect(typeof sorterModule.classKey).toBe('function')
+  })
+})
