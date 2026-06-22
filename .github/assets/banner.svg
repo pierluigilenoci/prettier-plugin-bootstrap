@@ -1,15 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="160" viewBox="0 0 900 160">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 160" width="740" height="160">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#7952b3"/>
-      <stop offset="100%" stop-color="#563d7c"/>
+    <linearGradient id="shield-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9061d0"/>
+      <stop offset="100%" stop-color="#6f42c1"/>
     </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#3d1f7a" flood-opacity="0.45"/>
+    </filter>
   </defs>
-  <rect width="900" height="160" fill="url(#bg)" rx="12"/>
-  <!-- Bootstrap B icon -->
-  <text x="48" y="108" font-family="Georgia, serif" font-size="80" font-weight="700" fill="white" opacity="0.95">B</text>
+
+  <!-- Bootstrap shield shape -->
+  <g transform="translate(24, 16)" filter="url(#shadow)">
+    <path d="
+      M64,0
+      C64,0 128,16 128,56
+      C128,96 128,104 108,120
+      C88,136 64,128 64,128
+      C64,128 40,136 20,120
+      C0,104 0,96 0,56
+      C0,16 64,0 64,0
+      Z
+    " fill="url(#shield-grad)"/>
+    <text
+      x="64" y="90"
+      font-family="Georgia, 'Times New Roman', serif"
+      font-size="78"
+      font-weight="700"
+      fill="white"
+      text-anchor="middle"
+    >B</text>
+  </g>
+
   <!-- Plugin name -->
-  <text x="120" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="36" font-weight="700" fill="white">prettier-plugin-bootstrap</text>
-  <!-- Tagline -->
-  <text x="122" y="118" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" fill="white" opacity="0.85">Automatically sort Bootstrap CSS classes with Prettier</text>
+  <text
+    x="186" y="68"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="28"
+    font-weight="300"
+    fill="#6f42c1"
+    letter-spacing="1"
+  >prettier-plugin-</text>
+  <text
+    x="186" y="112"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="40"
+    font-weight="700"
+    fill="#3d1f7a"
+  >bootstrap</text>
 </svg>
