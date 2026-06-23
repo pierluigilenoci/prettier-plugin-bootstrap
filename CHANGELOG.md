@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.1](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.4.0...v0.4.1) (2026-06-23)
+
+
+### Bug Fixes
+
+* **ci:** fix eslint-plugin job failures ([a20a0c9](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/a20a0c96c2fbe9304a2ba618c9249d42a92ef79d))
+* playground default import, author field, pin eslint-plugin devDeps ([e354924](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/e3549247b5713f9780cb99e778fb9e709f236ea0))
+* **playground:** copy all .mjs chunks to playground/dist ([de934c2](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/de934c2abe7e67deddf34ab00e0c65785127417b)), closes [#0](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/0)
+* **playground:** use namespace import; add author; pin eslint-plugin devDeps ([6f57539](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/6f57539181f6ef7994178181c3bccdf8afc2044f))
+* remove eslint-disable comments and fix underlying type issues ([9fbadd2](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/9fbadd2a67c5bdfb1a44fb00b4f71b539ffda0fc))
+* resolve issues [#68](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/68)-[#80](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/80) — docs, API, refactor, CI, tests, and bug fixes ([1408c43](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/1408c43713b9aa4b88528c7f4980d36d7f66ead6))
+* resolve issues [#68](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/68)–[#80](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/issues/80) (docs, API, refactor, CI, tests, bug fixes) ([f81589d](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/commit/f81589d0f78a5e748af5f29598fd3feadfdbd6ab))
+
 ## [0.4.0](https://github.com/pierluigilenoci/prettier-plugin-bootstrap/compare/v0.3.3...v0.4.0) (2026-06-22)
 
 
