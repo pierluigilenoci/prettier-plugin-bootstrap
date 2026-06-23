@@ -39,10 +39,10 @@
     "prettier-plugin-bootstrap": "*"
   },
   "devDependencies": {
-    "eslint": "*",
+    "eslint": "^10.0.0",
     "prettier-plugin-bootstrap": "workspace:*",
-    "typescript": "*",
-    "vitest": "*"
+    "typescript": "^6.0.0",
+    "vitest": "^4.1.9"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

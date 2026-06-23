@@ -48,6 +48,10 @@
     "astro",
     "angular"
   ],
+  "author": {
+    "name": "Pierluigi Lenoci",
+    "url": "https://github.com/pierluigilenoci"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pierluigilenoci/prettier-plugin-bootstrap.git"

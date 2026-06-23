@@ -51,16 +51,16 @@ importers:
   packages/eslint-plugin:
     devDependencies:
       eslint:
-        specifier: '*'
+        specifier: ^10.0.0
         version: 10.5.0(jiti@2.6.1)
       prettier-plugin-bootstrap:
         specifier: workspace:*
         version: link:../..
       typescript:
-        specifier: '*'
+        specifier: ^6.0.0
         version: 6.0.3
       vitest:
-        specifier: '*'
+        specifier: ^4.1.9
         version: 4.1.9(@types/node@25.9.3)(@vitest/coverage-v8@4.1.9)(vite@7.3.5(@types/node@25.9.3)(jiti@2.6.1))
 
 packages:
